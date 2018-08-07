@@ -1,5 +1,5 @@
-#ifndef __COMMON_POST_PROCESS_H
-#define __COMMON_POST_PROCESS_H
+#ifndef __XAPP_H
+#define __XAPP_H
 
 /* How many bits for ... */
 
@@ -68,4 +68,4 @@ int tokenizeInput(const char *cursor, TOKEN *tokens);
 long long parseCommon(const char *input);
 long long shiftCommon(long long base, long long amount);
 
-#endif /* __COMMON_POST_PROCESS_H */
+#endif /* __XAPP_H */

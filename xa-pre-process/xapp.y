@@ -1,7 +1,7 @@
 %error-verbose
 
 %code requires {
-	#include "common-post-process.h"
+	#include "xapp.h"
 }
 
 %{
@@ -10,8 +10,8 @@
 	#include <limits.h>
 	#include <math.h>
 
-	#include "common-post-process.h"
-	#include "common-post-process.yy.h"
+	#include "xapp.h"
+	#include "xapp.yy.h"
 %}
 
 %union {

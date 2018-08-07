@@ -2,8 +2,8 @@
 #include <limits.h>
 #include <string.h>
 
-#include "common-post-process.h"
-#include "common-post-process.yy.h"
+#include "xapp.h"
+#include "xapp.yy.h"
 
 long long result;
 

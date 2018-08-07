@@ -1,4 +1,4 @@
-TGT=common-post-process
+TGT=xapp
 
 $(TGT): main.c $(TGT).h $(TGT).re $(TGT).l $(TGT).y
 	re2c -is $(TGT).re -o $(TGT).c
@@ -7,4 +7,4 @@ $(TGT): main.c $(TGT).h $(TGT).re $(TGT).l $(TGT).y
 	gcc main.c $(TGT).c $(TGT).tab.c $(TGT).yy.c -lfl -lm -o $(TGT)
 
 clean: 
-	rm -f $(TGT).c $(TGT).yy.h $(TGT).yy.c $(TGT).tab.h $(TGT).tab.c
+	rm -f $(TGT).c $(TGT).yy.h $(TGT).yy.c $(TGT).tab.h $(TGT).tab.c $(TGT)
