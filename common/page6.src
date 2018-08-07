@@ -1,0 +1,36 @@
+#include "rom.h"
+#include "macros.h"
+
+	* = $600
+
+HDR(DEMO)
+	CMN
+	SET(R0, +1048575.999)
+	SET(R1, -1048575.999)
+	SET(R2, 0.0)
+	SET(R3, 0.0)
+	INR(R0)
+	DCR(R1)
+	INR(R2)
+	DCR(R3)
+	INR(R0)
+	DCR(R1)
+	ESC
+	BRK
+
+BGN(FACTORIAL)
+	SET(R1, $10.4456)
+	SET(R2, 1)
+	HEX(R1)
+	MOD(R3, R1, R2)
+	SUB(R1, R1, R3)
+_1	TST(R1)
+	BRZ(_2)
+	MUL(R2, R2, R1)
+	DEC(R1)
+	BRA(_1)
+_2	EXT(S0)
+	RTN
+END(FACTORIAL)
+
+END(DEMO)
