@@ -8,7 +8,7 @@ For example:
 * easier support for higher language compilers
 * arithmetic operations add, subtract, multiply, divide, and modulus
 * inherent overflow/underflow detection
-* all control branching is relative and 16 bits, for easier relocatable code
+* all control branching is 16-bit relative, for easier relocatable code
 * support for custom functions, akin to INT in x86
 
 Why 6502 and not, for example, x86?
