@@ -1,10 +1,45 @@
 # COMMON
-Advances some ideas using Steve Wozniak's SWEET16 interpreted byte-code language as inspiration. While the goal of SWEET16 was brevity, the goal of COMMON is functionality.
+Advances some ideas using Steve Wozniak's SWEET16 interpreted byte-code language as inspiration. While the goal of SWEET16 was brevity, the goal of COMMON is functionality. The intent is to make a platform suitable for many commercial, scientific, and engineering applications.
 
-To build and run:
+For example:
 
-    cd common-post-process ; make ; cp common-post-process ../common ; cd ..
-    cd common ; make ; cd ..
-    cd emulator ; make ; ./emulator < ../common/system.obj
+* native type is equivalent to fixed decimal ######.###
+* easier support for banked memory
+* easier support for higher language compilers
+* arithmetic operations add, subtract, multiply, divide, and modulus
+* inherent overflow/underflow detection
+* all control branching is relative and 16 bits, for easier relocatable code
+* support for custom functions, akin to INT in x86
 
-The makefiles use `re2c`, `flex`, `bison`, `gcc`, `cpp`, and `xa`.
+Why 6502 and not, for example, x86?
+
+* 6502 assembler is very easy and has a large archive of existing functions
+* existing 6502 SWEET16 does the "hard work"
+* interesting to see it run in newer versions of 6502 processors
+* how do you think Bender does what he does? (or the Terminator!)
+
+In progress:
+
+* add all the instructions (see `common/common.h` for the list)
+* a simple unit test suite to ensure each instruction is correct
+
+The meat of the project:
+
+* `common/common.h`: details of instructions
+* `common/common.asm`: defines the core instructions
+* `common/macros.h`: macros used to define the byte-code
+* `common/page6.src`: sample source file using the macros
+
+Auxiliary:
+
+* `emulator/*`: 6502 emulator (borrowed Mike Chambers' Fake6502 CPU emulator v1.1 ©2011)
+* `common-post-process/*`: this utility converts 32-bit fixed decimal quantities so that `xa` can use them
+
+Right now, for testing purposes, the code builds everything into one file `system.obj` and runs the code in the last block loaded, in this case, the code corresponding to `page6.src`. Eventually will support decoupling of system and application files.
+
+*To build and run:*
+
+    make
+    make run
+
+The makefiles use `re2c`, `flex`, `bison`, `gcc`, `cpp`, and `xa`. Will eventually support a `make install` which will install all of this.

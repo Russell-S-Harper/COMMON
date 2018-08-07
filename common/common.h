@@ -3,7 +3,8 @@
 
 ; Using four byte quantities aabbccdd with sign bit, overflow/underflow bit, 20 bits significand, 10 bits
 ; fraction. The quantity is valid if the overflow/underflow bit agrees with the sign bit. The intent is
-; to be able to recognize an overflow/underflow situation, rescale the arguments, and repeat.
+; to be able to recognize an overflow/underflow situation, rescale the arguments, and repeat the
+; calculation.
 
 ; Largest value:          $3fffffff or  1048575.999(9)
 ; Smallest value:         $c0000001 or -1048575.999(0)
@@ -136,6 +137,6 @@ _MNS_1	= %11111100	; i.e. the $FC part of $FFFFFC00
 
 ; masks for overflow and underflow
 _MSK_O	= %11000000	; mask for overflow
-_MSK_U	= %11000000	; mask for underflow
+_MSK_U	= %11000000	; mask for underflow - yes, the same!
 
 #endif /* __COMMON_H */
