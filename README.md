@@ -1,6 +1,6 @@
 # COMMON
 
-Advances some ideas using Steve Wozniak's SWEET16 interpreted byte-code language as inspiration. While the goal of SWEET16 was brevity, the goal of COMMON is functionality. The intent is to make a platform suitable for many commercial, scientific, and engineering applications.
+Advances some ideas using Steve Wozniak's 6502 SWEET16 interpreted byte-code language as inspiration. While the goal of SWEET16 was brevity, the goal of COMMON is functionality. The intent is to make a platform suitable for many commercial, scientific, and engineering applications.
 
 For example:
 
@@ -36,7 +36,7 @@ Auxiliary:
 * `emulator/*`: 6502 emulator (borrowed Mike Chambers' Fake6502 CPU emulator v1.1 ©2011)
 * `xa-pre-process/*`: utility `xapp` to convert 32-bit fixed decimal quantities so that `xa` can use them
 
-Right now, for testing purposes, the code builds everything into one file `system.obj` and runs the code in the last block loaded, in this case, the code corresponding to `page6.src`. Eventually will support decoupling of system and application files.
+Right now, for testing purposes, the code builds everything into one file `system.obj` and runs the code in the last block loaded, in this case, the code corresponding to `page6.src`. Eventually will support decoupling of system and application files. Application files will be inherently relocatable.
 
 To build and run:
 
