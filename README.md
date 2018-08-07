@@ -1,6 +1,6 @@
 # COMMON
 
-Advances some ideas using Steve Wozniak's 6502 SWEET16 interpreted byte-code language as inspiration. While the goal of SWEET16 was brevity, the goal of COMMON is functionality. The intent is to make a platform suitable for many commercial, scientific, and engineering applications.
+Advances some ideas using Steve Wozniak’s 6502 SWEET16 interpreted byte-code language as inspiration. While the goal of SWEET16 was brevity, the goal of COMMON is functionality. The intent is to make a platform suitable for many commercial, scientific, and engineering applications.
 
 For example:
 
@@ -15,7 +15,7 @@ For example:
 Why 6502 and not, for example, x86?
 
 * 6502 assembler is very easy and has a large archive of existing functions
-* existing 6502 SWEET16 does the "hard work"
+* existing 6502 SWEET16 already has the “hard work” done
 * interesting to see it run in newer versions of 6502 processors
 * how do you think Bender does what he does? (or the Terminator!)
 
@@ -33,7 +33,7 @@ The meat of the project:
 
 Auxiliary:
 
-* `emulator/*`: 6502 emulator (borrowed Mike Chambers' Fake6502 CPU emulator v1.1 ©2011)
+* `emulator/*`: 6502 emulator (borrowed Mike Chambers’ Fake6502 CPU emulator v1.1 ©2011)
 * `xa-pre-process/*`: utility `xapp` to convert 32-bit fixed decimal quantities so that `xa` can use them
 
 Right now, for testing purposes, the code builds everything into one file `system.obj` and runs the code in the last block loaded, in this case, the code corresponding to `page6.src`. Eventually will support decoupling of system and application files. Application files will be inherently relocatable.
