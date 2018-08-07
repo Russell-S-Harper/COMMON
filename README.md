@@ -10,7 +10,7 @@ For example:
 * arithmetic operations add, subtract, multiply, divide, and modulus
 * inherent overflow/underflow detection
 * all control branching is 16-bit relative, for easier relocatable code
-* support for custom functions, akin to INT in x86
+* support for custom system/user functions, akin to INT in x86
 
 Why 6502 and not, for example, x86?
 
@@ -43,4 +43,4 @@ To build and run:
     make
     make run
 
-The makefiles use `re2c`, `flex`, `bison`, `gcc`, `cpp`, and `xa`. Will eventually support a `make install` which will install all of these.
+The makefiles use `re2c`, `flex`, `bison`, `gcc`, `cpp`, and `xa`. Will eventually provide a `./configure`.
