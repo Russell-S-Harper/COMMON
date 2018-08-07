@@ -27,8 +27,8 @@ In progress:
 The meat of the project:
 
 * `common/common.h`: details of instructions
-* `common/common.asm`: defines the core instructions
-* `common/macros.h`: macros used to define the byte-code
+* `common/common.asm`: assembler code for the instructions
+* `common/macros.h`: macros used to define the interpreted byte-code
 * `common/page6.src`: sample source file using the macros
 
 Auxiliary:
@@ -43,4 +43,4 @@ To build and run:
     make
     make run
 
-The makefiles use `re2c`, `flex`, `bison`, `gcc`, `cpp`, and `xa`. Will eventually support a `make install` which will install all of this.
+The makefiles use `re2c`, `flex`, `bison`, `gcc`, `cpp`, and `xa`. Will eventually support a `make install` which will install all of these.
