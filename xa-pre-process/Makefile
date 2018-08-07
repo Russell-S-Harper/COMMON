@@ -1,4 +1,4 @@
-TGT=common-post-process
+TGT=xapp
 
 $(TGT): main.c $(TGT).h $(TGT).re $(TGT).l $(TGT).y
 	re2c -is $(TGT).re -o $(TGT).c

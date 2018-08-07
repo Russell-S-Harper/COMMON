@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "common-post-process.tab.h"
+#include "xapp.tab.h"
 
 %}
 

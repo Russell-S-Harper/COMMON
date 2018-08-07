@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "common-post-process.h"
+#include "xapp.h"
 
 static int copyToken(TOKEN *tokens, int index, TOKEN_TYPE type, const char *text, int length);
 

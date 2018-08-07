@@ -1,4 +1,4 @@
-POPR=../common-post-process/common-post-process
+XAPP=../xa-pre-process/xapp
 
 system.obj: common.obj page6.obj
 	cat common.obj page6.obj > system.obj
@@ -7,7 +7,7 @@ common.obj: rom.h common.h common.asm
 	xa -M common.asm -l common.lbl -o common.obj
 
 page6.obj: rom.h macros.h page6.src
-	cpp -P page6.src | $(POPR) > page6.asm
+	cpp -P page6.src | $(XAPP) > page6.asm
 	xa -M page6.asm -l page6.lbl -o page6.obj
 
 clean: 

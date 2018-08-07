@@ -1,4 +1,5 @@
 # COMMON
+
 Advances some ideas using Steve Wozniak's SWEET16 interpreted byte-code language as inspiration. While the goal of SWEET16 was brevity, the goal of COMMON is functionality. The intent is to make a platform suitable for many commercial, scientific, and engineering applications.
 
 For example:
@@ -33,11 +34,11 @@ The meat of the project:
 Auxiliary:
 
 * `emulator/*`: 6502 emulator (borrowed Mike Chambers' Fake6502 CPU emulator v1.1 ©2011)
-* `common-post-process/*`: this utility converts 32-bit fixed decimal quantities so that `xa` can use them
+* `xa-pre-process/*`: utility `xapp` to convert 32-bit fixed decimal quantities so that `xa` can use them
 
 Right now, for testing purposes, the code builds everything into one file `system.obj` and runs the code in the last block loaded, in this case, the code corresponding to `page6.src`. Eventually will support decoupling of system and application files.
 
-*To build and run:*
+To build and run:
 
     make
     make run
