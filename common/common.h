@@ -1,8 +1,8 @@
 #ifndef __COMMON_H
 #define __COMMON_H
 
-; Using four byte quantities aabbccdd with sign bit, overflow/underflow bit, 20 bits significand, 10 bits
-; fraction. The quantity is valid if the overflow/underflow bit agrees with the sign bit. The intent is
+; Using four byte quantities aabbccdd with sign bit, overflow bit, 20 bits significand, 10 bits
+; fraction. The quantity is valid if the overflow bit agrees with the sign bit. The intent is
 ; to be able to recognize an overflow/underflow situation, rescale the arguments, and repeat the
 ; calculation.
 
@@ -135,8 +135,6 @@ _EXT_C	= $f0
 _PLS_1	= %00000100	; i.e. the $04 part of $00000400
 _MNS_1	= %11111100	; i.e. the $FC part of $FFFFFC00
 
-; masks for overflow and underflow
 _MSK_O	= %11000000	; mask for overflow
-_MSK_U	= %11000000	; mask for underflow - yes, the same!
 
 #endif /* __COMMON_H */
