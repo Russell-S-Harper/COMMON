@@ -181,26 +181,25 @@ _EXC	.(		; EXC r			4r		Rr <-> RS	- exchange Rr with stack
 	RTS
 .)
 
-_INR	.(		; INR r			5r		Rr <- Rr + 1.0	- increment register
+_ADDRD	.(		; add RD to register indexed by X
 	LDA _R0+3,X
 	AND #_MSK_O	; check for existing overflow condition
 	BEQ _4
 	EOR #_MSK_O
-	BEQ _4
-	BNE _3		; existing overflow, skip increment operation
-_4	LDA #_PLS_1	; adding plus one
-	CLC
+	BNE _3		; existing overflow, skip decrement operation
+_4	CLC		; adding RD
+	LDA _RD
+	ADC _R0,X
+	STA _R0,X
+	LDA _RD+1
 	ADC _R0+1,X
 	STA _R0+1,X
-	BCC _1
-	LDA #0
+	LDA _RD+2
 	ADC _R0+2,X
 	STA _R0+2,X
-	BCC _1
-	LDA #0
+	LDA _RD+3
 	ADC _R0+3,X
 	STA _R0+3,X
-_1	LDA _R0+3,X
 	AND #_MSK_O	; check for overflow
 	BEQ _2
 	EOR #_MSK_O
@@ -215,36 +214,26 @@ _2	LDA _F		; clear overflow
 _5	RTS
 .)
 
+_INR	.(		; INR r			5r		Rr <- Rr + 1.0	- increment register
+	LDA #0		; set RD to plus one
+	STA _RD
+	LDA #_PLS_1
+	STA _RD+1
+	LDA #0
+	STA _RD+2
+	STA _RD+3
+	BEQ _ADDRD
+.)
+
 _DCR	.(		; DCR r			6r		Rr <- Rr - 1.0	- decrement register
-	LDA _R0+3,X
-	AND #_MSK_U	; check for existing underflow condition
-	BEQ _4
-	EOR #_MSK_U
-	BEQ _4
-	BNE _3		; existing underflow, skip decrement operation
-_4	LDA #_MNS_1	; adding minus one
-	CLC
-	ADC _R0+1,X
-	STA _R0+1,X
+	LDA #0		; set RD to minus one
+	STA _RD
+	LDA #_MNS_1
+	STA _RD+1
 	LDA #$FF
-	ADC _R0+2,X
-	STA _R0+2,X
-	LDA #$FF
-	ADC _R0+3,X
-	STA _R0+3,X
-_1	LDA _R0+3,X
-	AND #_MSK_U	; check for underflow
-	BEQ _2
-	EOR #_MSK_U
-	BEQ _2
-_3	LDA _F		; set underflow
-	ORA #_F_U
-	STA _F
-	BNE _5
-_2	LDA _F		; clear underflow
-	AND #_F_U^$FF
-	STA _F
-_5	RTS
+	STA _RD+2
+	STA _RD+3
+	BNE _ADDRD
 .)
 
 _TST	.(		; TST r			7r		F <- Rr <=> 0.0	- test register
@@ -298,6 +287,19 @@ _BRA	.(		; BRA xxyy		03 yy xx	PC <- PC + xxyy	- branch always
 	RTS
 .)
 
+_BRX	.(		; generic branch testing
+	AND _F		; check the bit
+	BNE _BRA	; if set, branch
+	CLC		; not set, advance the program counter over the xxyy offset
+	LDA #2
+	ADC _PCL
+	STA _PCL
+	LDA #0
+	ADC _PCH
+	STA _PCH
+	RTS
+.)
+
 _BRE	.(		; BRE xxyy		04 yy xx	PC <- PC + xxyy	- branch if Rp = Rq (after CMP)
 	LDA #_F_E
 	BNE _BRX
@@ -335,16 +337,7 @@ _BRO	.(		; BRO xxyy		0a yy xx	PC <- PC + xxyy	- branch if overflow (after arithm
 
 _BRU	.(		; BRU xxyy		0b yy xx	PC <- PC + xxyy	- branch if underflow (after arithmetic operations)
 	LDA #_F_U
-	BNE _BRX	; (TODO) this line can probably be removed
-.)
-
-_BRX	.(		; generic branch testing
-	AND _F		; check the bit
-	BNE _BRA	; if set, branch
-	INC _PCL	; not set, advance the program counter
-	BNE _1
-	INC _PCH
-_1	RTS
+	BNE _BRX
 .)
 
 _CPR	.(		; CPR pq		0c pq		Rp <- Rq	- copy register
