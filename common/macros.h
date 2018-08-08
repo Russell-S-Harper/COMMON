@@ -75,8 +75,8 @@
 #define SVI(p, q)	.BYTE _SVI_C, p * 16 + q
 #define CMR(p, q)	.BYTE _CMR_C, p * 16 + q
 #define SET(r, v)	.BYTE _SET_C + r, _SET_V(#v)
-#define POP(r)		.BYTE _POP_C + r
 #define PSH(r)		.BYTE _PSH_C + r
+#define POP(r)		.BYTE _POP_C + r
 #define EXC(r)		.BYTE _EXC_C + r
 #define INR(r)		.BYTE _INR_C + r
 #define DCR(r)		.BYTE _DCR_C + r

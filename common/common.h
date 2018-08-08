@@ -14,8 +14,8 @@
 ; Instructions
 
 ; SET r aabbcc.dd	1r dd cc bb aa	Rr <- aabbccdd	- set register
-; POP r			2r		Rr <- RS	- pop from stack
-; PSH r			3r		RS <- Rr	- push onto stack
+; PSH r			2r		RS <- Rr	- push onto stack
+; POP r			3r		Rr <- RS	- pop from stack
 ; EXC r			4r		Rr <-> RS	- exchange Rr with stack
 ; INR r			5r		Rr <- Rr + 1.0	- increment register
 ; DCR r			6r		Rr <- Rr - 1.0	- decrement register
@@ -89,11 +89,12 @@ _IDX	= _ACC + 1	; saved index X to restore
 _IDY	= _IDX + 1	; saved index Y to restore
 _PS	= _IDY + 1	; saved processor status to restore
 
-; 256 bytes of page two
+; 224 bytes of page two
 _RS	= $200		; register stack
+_RSS	= (FN_FX - _RS)	; register stack size
 
-; 64 bytes of page three
-FN_FX	= $300		; list of system and user functions
+; last 32 bytes of page two
+FN_FX	= $2E0		; list of system and user functions
 
 ; function constants
 _ESC_C	= $00
@@ -114,8 +115,8 @@ _SVI_C	= $0e
 _CMR_C	= $0f
 
 _SET_C	= $10
-_POP_C	= $20
-_PSH_C	= $30
+_PSH_C	= $20
+_POP_C	= $30
 _EXC_C	= $40
 _INR_C	= $50
 _DCR_C	= $60
