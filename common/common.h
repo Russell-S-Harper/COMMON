@@ -14,8 +14,8 @@
 ; Instructions
 
 ; SET r aabbcc.dd	1r dd cc bb aa	Rr <- aabbccdd	- set register
-; POP r			2r		Rr <- RS	- pop from stack
-; PSH r			3r		RS <- Rr	- push onto stack
+; PSH r			2r		RS <- Rr	- push onto stack
+; POP r			3r		Rr <- RS	- pop from stack
 ; EXC r			4r		Rr <-> RS	- exchange Rr with stack
 ; INR r			5r		Rr <- Rr + 1.0	- increment register
 ; DCR r			6r		Rr <- Rr - 1.0	- decrement register
@@ -115,8 +115,8 @@ _SVI_C	= $0e
 _CMR_C	= $0f
 
 _SET_C	= $10
-_POP_C	= $20
-_PSH_C	= $30
+_PSH_C	= $20
+_POP_C	= $30
 _EXC_C	= $40
 _INR_C	= $50
 _DCR_C	= $60
