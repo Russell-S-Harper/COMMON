@@ -89,11 +89,12 @@ _IDX	= _ACC + 1	; saved index X to restore
 _IDY	= _IDX + 1	; saved index Y to restore
 _PS	= _IDY + 1	; saved processor status to restore
 
-; 256 bytes of page two
+; 224 bytes of page two
 _RS	= $200		; register stack
+_RSS	= (FN_FX - _RS)	; register stack size
 
-; 64 bytes of page three
-FN_FX	= $300		; list of system and user functions
+; last 32 bytes of page two
+FN_FX	= $2E0		; list of system and user functions
 
 ; function constants
 _ESC_C	= $00

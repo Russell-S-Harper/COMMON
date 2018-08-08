@@ -118,7 +118,9 @@ _1	RTS		; done
 
 _POP	.(		; POP r			2r		Rr <- RS	- pop from stack
 	LDY _RSI	; get register stack index
-	DEY		; transfer four bytes over
+	BNE _1		; all good, something can be popped off the stack
+	BRK		; next pop will cause a stack underflow, abort and call exception handler (TODO)
+_1	DEY		; transfer four bytes over
 	LDA _RS,Y
 	STA _R0+3,X
 	DEY
@@ -136,7 +138,10 @@ _POP	.(		; POP r			2r		Rr <- RS	- pop from stack
 
 _PSH	.(		; PSH r			3r		RS <- Rr	- push onto stack
 	LDY _RSI	; get register stack index
-	LDA _R0,X	; transfer four bytes over
+	CPY #_RSS	; compare against limit
+	BCC _1		; still room, all okay
+	BRK		; next push will cause a stack overflow, abort and call exception handler (TODO)
+_1	LDA _R0,X	; transfer four bytes over
 	STA _RS,Y
 	INY
 	LDA _R0+1,X
