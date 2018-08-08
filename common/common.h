@@ -138,4 +138,7 @@ _MNS_1	= %11111100	; i.e. the $FC part of $FFFFFC00
 
 _MSK_O	= %11000000	; mask for overflow
 
+; mask for TST
+_MSK_T	= (_F_Z + _F_P + _F_N)^$FF
+
 #endif /* __COMMON_H */
