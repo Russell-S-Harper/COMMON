@@ -15,6 +15,9 @@ HDR(DEMO)
 	DCR(R3)
 	INR(R0)
 	DCR(R1)
+	TST(R4)
+	TST(R2)
+	TST(R3)
 	ESC
 	BRK
 

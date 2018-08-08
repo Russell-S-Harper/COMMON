@@ -242,6 +242,22 @@ _DCR	.(		; DCR r			6r		Rr <- Rr - 1.0	- decrement register
 .)
 
 _TST	.(		; TST r			7r		F <- Rr <=> 0.0	- test register
+	LDA _F
+	AND #_MSK_T	; clear TST bits
+	STA _F
+	LDA _R0+3,X	; check highest byte
+	BMI _1		; is negative
+	ORA _R0+2,X	; could be positive or zero, OR with all other bytes
+	ORA _R0+1,X
+	ORA _R0,X
+	BNE _2		; is positive
+	LDA #_F_Z	; set zero flag
+	BNE _3
+_1	LDA #_F_N	; set negative flag
+	BNE _3
+_2	LDA #_F_P	; set positive flag
+_3	ORA _F
+	STA _F
 	RTS
 .)
 
