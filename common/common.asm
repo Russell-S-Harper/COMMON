@@ -65,11 +65,11 @@ _5	TXA		; get operand
 	RTS		; "return" to routine
 .)
 
-_INI .(			; initialize common
+_INI	.(		; initialize common
+	LDA #0		; initialize RSI
+	STA _RSI
 			; copy system functions (TODO)
 			; load program (TODO)
-	LDA #0		; clear RSI
-	STA _RSI
 	JMP (_PC)	; go to last loaded block
 .)
 
