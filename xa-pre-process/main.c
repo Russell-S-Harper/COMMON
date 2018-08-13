@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 			int i;
 			for (i = 0; i < count; ++i)
 			{
-				int j;
+				int j, sign;
 				unsigned long working;
 				const char *s = "", *p, *q;
 				switch (tokens[i].type)
@@ -37,8 +37,14 @@ int main(int argc, char **argv)
 						yyin = fmemopen((void *)p, q - p, "r");
 						yyparse();
 						fclose(yyin);
-						/* Output */
+						/* Round towards ± infinity */
+						sign = result < 0? -1: +1;
+						if (sign < 0) result = -result;
+						result += 1 << (INT_FRAC - EXP_FRAC - 1);
+						if (sign < 0) result = -result;
+						/* Normalize */
 						working = (unsigned long)((result >> (INT_FRAC - EXP_FRAC)) % (1 << EXP_FULL));
+						/* Output in .BYTE format */
 						for (j = 0; j < EXP_FULL; j += CHAR_BIT)
 						{
 							printf("%s$%02lX", s, working & 0xff);
