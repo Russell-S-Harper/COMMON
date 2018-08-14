@@ -299,7 +299,17 @@ _2	INC _PCL	; advance PC
 _3	RTS
 .)
 
-_TRFDR	.(		; transfers RD to X as r register, updates overflow flag
+_RETZD	.(		; clears register D, falls through to _TRFDR
+	LDA #0
+	STA _RD
+	STA _RD+1
+	STA _RD+2
+	STA _RD+3
+.)
+
+_TRFDR	.(		; pulls X, transfers RD to X as r register, updates overflow flag
+	PLA
+	TAX
 	LDA _RD		; transfer result to Rr
 	STA _R0,X
 	LDA _RD+1
@@ -339,9 +349,7 @@ _ADD	.(		; ADD r pq		ar pq		Rr <- Rp + Rq	- addition
 	LDA _R0+3,X
 	ADC _R0+3,Y
 	STA _RD+3
-	PLA		; get r register
-	TAX
-	JMP _TRFDR	; transfer RD to r register, let it handle the return
+	JMP _TRFDR	; pull X, transfer RD to r register, let it handle the return
 .)
 
 _SUB	.(		; SUB r pq		br pq		Rr <- Rp - Rq	- subtraction
@@ -361,13 +369,146 @@ _SUB	.(		; SUB r pq		br pq		Rr <- Rp - Rq	- subtraction
 	LDA _R0+3,X
 	SBC _R0+3,Y
 	STA _RD+3
-	PLA		; get r register
-	TAX
-	JMP _TRFDR	; transfer RD to r register, let it handle the return
+	JMP _TRFDR	; pull X, transfer RD to r register, let it handle the return
+.)
+
+_TRFQD	.(		; transfers Y as q register to RD
+	LDA _R0,Y
+	STA _RD
+	LDA _R0+1,Y
+	STA _RD+1
+	LDA _R0+2,Y
+	STA _RD+2
+	LDA _R0+3,Y
+	STA _RD+3
+	RTS
+.)
+
+_NEGRY	.(		; negates register at Y
+	SEC
+	LDA #0
+	SBC _R0,Y
+	STA _R0,Y
+	LDA #0
+	SBC _R0+1,Y
+	STA _R0+1,Y
+	LDA #0
+	SBC _R0+2,Y
+	STA _R0+2,Y
+	LDA #0
+	SBC _R0+3,Y
+	STA _R0+3,Y
+	RTS
+.)
+
+_ABSRY	.(		; sets register at Y to absolute value
+	LDA _R0+3,Y
+	BMI _NEGRY
+	RTS
 .)
 
 _MUL	.(		; MUL r pq		cr pq		Rr <- Rp * Rq	- multiplication
-	RTS
+	TXA		; adapted from http://www.6502.org/source/integers/32muldiv.htm
+	PHA		; save r register for later
+	JSR _GETPQ
+	LDA _R0,X	; check for zero argument
+	ORA _R0+1,X
+	ORA _R0+2,X
+	ORA _R0+3,X
+	BNE _1		; p is non-zero
+	JMP _RETZD	; p is zero, return zero
+_1	LDA _R0,Y	; check for zero argument
+	ORA _R0+1,Y
+	ORA _R0+2,Y
+	ORA _R0+3,Y
+	BNE _2		; q is non-zero
+	JMP_RETZD	; q is zero, return zero
+_2	LDA _R0+3,X	; save sign of register p
+	AND #%11000000
+	PHA
+	EOR _R0+3,Y
+	AND #%11000000	; save sign of product
+	PHA
+	JSR _TRFQD
+	TXA
+	TAY		; absolute value of register p
+	JSR _ABSRY
+	LDY #_RD-_R0	; absolute value of register q saved in D
+	JSR _ABSRY
+	LDA #0
+	STA _RB+4	; clear upper half of product
+	STA _RB+5
+	STA _RB+6
+	STA _RB+7
+	LDY #34		; thirty bit multiply and four bit shift
+_3	LSR _RD+3	; shift operand
+	ROR _RD+2
+	ROR _RD+1
+	ROR _RD
+	BCC _4		; skip adding in product if bit is zero
+	CLC
+	LDA _RB+4	; add in p register
+	ADC _R0,X
+	STA _RB+4
+	LDA _RB+5
+	ADC _R0+1,X
+	STA _RB+5
+	LDA _RB+6
+	ADC _R0+2,X
+	STA _RB+6
+	LDA _RB+7
+	ADC _R0+3,X
+_4	ROR		; shift the product
+	STA _RB+7
+	ROR _RB+6
+	ROR _RB+5
+	ROR _RB+4
+	ROR _RB+3
+	ROR _RB+2
+	ROR _RB+1
+	ROR _RB
+	DEY
+	BNE _3		; repeat until bits are done
+	LDA _RB+1	; copy result to RD
+	STA _RD
+	LDA _RB+2
+	STA _RD+1
+	LDA _RB+3
+	STA _RD+2
+	LDA _RB+4
+	STA _RD+3
+	AND #_MSK_O	; consider the overflow bits
+	ORA _RB+5	; check all the other bytes
+	ORA _RB+6
+	ORA _RB+7
+	BEQ _5		; all zeroes means no overflow
+	LDA _RD+3	; overflow situation, set accordingly
+	AND #_MSK_O^$FF	; set overflow
+	ORA #_F_O
+	STA _RD+3
+	BNE _6
+_5	LDA _RD		; check for underflow
+	ORA _RD+1
+	ORA _RD+2
+	ORA _RD+3
+	BNE _6		; non-zero result means no underflow
+	LDA _F		; we checked earlier for zero operands, so a zero result means underflow, set underflow
+	ORA #_F_U
+	STA _F
+	BNE _7
+_6	LDA _F		; clear underflow
+	AND #_F_U^$FF
+	STA _F
+_7	PLA		; set the sign of the product
+	BEQ _8
+	LDY #_RD-_R0	; negate register D
+	JSR _NEGRY
+_8	PLA		; reset the sign of register p
+	BEQ _9
+	TXA
+	TAY
+	JSR _NEGRY
+_9	JMP _TRFDR	; pull X, transfer RD to r register, let it handle the return
 .)
 
 _DIV	.(		; DIV r pq		dr pq		Rr <- Rp / Rq	- division
