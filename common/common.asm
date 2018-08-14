@@ -269,12 +269,101 @@ _HEX	.(		; HEX r			9r		Rr <- hex(Rr)	- convert Rr from decimal ######.## to hex 
 	RTS
 .)
 
+_GETPQ	.(		; sets X as p register and Y as q register, advances PC
+	LDY #0
+	LDA (_PC),Y	; get source registers
+	LSR
+	LSR
+	AND #_MSK_R	; p register
+	TAX
+	LDA (_PC),Y
+	ASL
+	ASL
+	AND #_MSK_R	; q register
+	TAY
+	LDA _R0+3,X
+	AND #_MSK_O	; check for existing overflow condition
+	BEQ _1		; sign and overflow are both clear
+	EOR #_MSK_O
+	BEQ _1		; sign and overflow are both set
+	BRK		; an operand is in an overflow condition, abort and call exception handler (TODO)
+_1	LDA _R0+3,Y
+	AND #_MSK_O	; check for existing overflow condition
+	BEQ _2		; sign and overflow are both clear
+	EOR #_MSK_O
+	BEQ _2		; sign and overflow are both set
+	BRK		; an operand is in an overflow condition, abort and call exception handler (TODO)
+_2	INC _PCL	; advance PC
+	BNE _3
+	INC _PCH
+_3	RTS
+.)
+
+_TRFDR	.(		; transfers RD to X as r register, updates overflow flag
+	LDA _RD		; transfer result to Rr
+	STA _R0,X
+	LDA _RD+1
+	STA _R0+1,X
+	LDA _RD+2
+	STA _R0+2,X
+	LDA _RD+3
+	STA _R0+3,X
+	AND #_MSK_O	; check for overflow
+	BEQ _4
+	EOR #_MSK_O
+	BEQ _4
+_3	LDA _F		; set overflow
+	ORA #_F_O
+	STA _F
+	BNE _5
+_4	LDA _F		; clear overflow
+	AND #_F_O^$FF
+	STA _F
+_5	RTS
+.)
+
 _ADD	.(		; ADD r pq		ar pq		Rr <- Rp + Rq	- addition
-	RTS
+	TXA
+	PHA		; save r register for later
+	JSR _GETPQ
+	CLC		; set RD to Rp + Rq
+	LDA _R0,X
+	ADC _R0,Y
+	STA _RD		
+	LDA _R0+1,X
+	ADC _R0+1,Y
+	STA _RD+1		
+	LDA _R0+2,X
+	ADC _R0+2,Y
+	STA _RD+2		
+	LDA _R0+3,X
+	ADC _R0+3,Y
+	STA _RD+3
+	PLA		; get r register
+	TAX
+	JMP _TRFDR	; transfer RD to r register, let it handle the return
 .)
 
 _SUB	.(		; SUB r pq		br pq		Rr <- Rp - Rq	- subtraction
-	RTS
+	TXA
+	PHA		; save r register for later
+	JSR _GETPQ
+	SEC		; set RD to Rp - Rq
+	LDA _R0,X
+	SBC _R0,Y
+	STA _RD		
+	LDA _R0+1,X
+	SBC _R0+1,Y
+	STA _RD+1		
+	LDA _R0+2,X
+	SBC _R0+2,Y
+	STA _RD+2		
+	LDA _R0+3,X
+	SBC _R0+3,Y
+	STA _RD+3
+	PLA		; get r register
+	TAX
+	JMP _TRFDR	; transfer RD to r register, let it handle the return
 .)
 
 _MUL	.(		; MUL r pq		cr pq		Rr <- Rp * Rq	- multiplication
