@@ -269,7 +269,7 @@ _HEX	.(		; HEX r			9r		Rr <- hex(Rr)	- convert Rr from decimal ######.## to hex 
 	RTS
 .)
 
-_GETPQ	.(		; sets X as p register and Y as q register, advances PC
+_GETPQ	.(		; sets X as p register and Y as q register, checks for overflow in the operands, advances PC
 	LDY #0
 	LDA (_PC),Y	; get source registers
 	LSR
