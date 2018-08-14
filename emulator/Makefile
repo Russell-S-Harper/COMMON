@@ -3,4 +3,3 @@ emulator: emulator.h emulator.c main.c
 
 clean:
 	rm -f emulator
-
