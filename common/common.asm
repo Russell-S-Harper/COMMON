@@ -422,7 +422,7 @@ _1	LDA _R0,Y	; check for zero argument
 	ORA _R0+2,Y
 	ORA _R0+3,Y
 	BNE _2		; q is non-zero
-	JMP_RETZD	; q is zero, return zero
+	JMP _RETZD	; q is zero, return zero
 _2	LDA _R0+3,X	; save sign of register p
 	AND #%11000000
 	PHA
