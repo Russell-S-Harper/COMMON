@@ -1,7 +1,7 @@
 #include "common.h"
 
-#ifndef MACROS_H
-#define MACROS_H
+#ifndef __MACROS_H
+#define __MACROS_H
 
 ; registers
 #define	R0		0
@@ -95,4 +95,4 @@
 #define BGN(a)		a .(
 #define END(a)		.):_END_##a
 
-#endif // MACROS_H
+#endif /* __MACROS_H */
