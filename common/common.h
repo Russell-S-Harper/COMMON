@@ -58,9 +58,9 @@ _R7	= _R6 + 4
 _R8	= _R7 + 4
 _R9	= _R8 + 4
 _RA	= _R9 + 4
-_RB	= _RA + 4
-_RC	= _RB + 4	; workspace for arithmetic operations
-_RD	= _RC + 4	; as above and for EXC
+_RB	= _RA + 4	; workspace for MUL, DIV, and MOD
+_RC	= _RB + 4	; as above
+_RD	= _RC + 4	; as above and for ADD, SUB, and EXC
 _RE	= _RD + 4	; register E maintains common status
 _RF	= _RE + 4	; register F saves/restores processor status
 
