@@ -487,7 +487,3 @@ _END_CMN_DT
 	; 6502 NMI, Reset and IRQ
 	* = $FFFA
 ADDR	.WORD 0, _INI, 0
-
-
-
-
