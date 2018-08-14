@@ -7,9 +7,9 @@
 ; calculation.
 
 ; Largest value:              $3fffffff or  1048575.999(5)
-; Smallest value:             $c0000001 or -1048575.998(5) <- note 998(5)
-; Largest value for DEC/HEX:  $3d08ffff or   999999.999(5)
-; Smallest value for DEC/HEX: $c2f70000 or  -999999.999(5)
+; Smallest value:             $c0000000 or -1048576.000(0)
+; Largest value for DEC/HEX:  $3d08ffff or   999999.999
+; Smallest value for DEC/HEX: $c2f70001 or  -999999.999
 
 ; Instructions
 
@@ -47,7 +47,7 @@
 ; CMR pq		0f pq		F <- Rp <=> Rq	- compare registers
 
 ; 64 bytes in page zero for common registers
-_R0	= $C0
+_R0	= $c0
 _R1	= _R0 + 4
 _R2	= _R1 + 4
 _R3	= _R2 + 4
@@ -94,7 +94,7 @@ _RS	= $200		; register stack
 _RSS	= (FN_FX - _RS)	; register stack size
 
 ; last 32 bytes of page two
-FN_FX	= $2E0		; list of system and user functions
+FN_FX	= $2e0		; list of system and user functions
 
 ; function constants
 _ESC_C	= $00
@@ -134,11 +134,12 @@ _EXT_C	= $f0
 
 ; plus and minus 1 for increment and decrement
 _PLS_1	= %00000100	; i.e. the $04 part of $00000400
-_MNS_1	= %11111100	; i.e. the $FC part of $FFFFFC00
+_MNS_1	= %11111100	; i.e. the $fc part of $fffffc00
 
 _MSK_O	= %11000000	; mask for overflow
+_MSK_R	= %00111100	; mask for registers
 
 ; mask for TST
-_MSK_T	= (_F_Z + _F_P + _F_N)^$FF
+_MSK_T	= (_F_Z + _F_P + _F_N)^$ff
 
 #endif /* __COMMON_H */

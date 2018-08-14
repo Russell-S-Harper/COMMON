@@ -24,7 +24,6 @@ int main(int argc, char **argv)
 			for (i = 0; i < count; ++i)
 			{
 				int j, sign;
-				unsigned long working;
 				const char *s = "", *p, *q;
 				switch (tokens[i].type)
 				{
@@ -41,14 +40,14 @@ int main(int argc, char **argv)
 						sign = result < 0? -1: +1;
 						if (sign < 0) result = -result;
 						result += 1 << (INT_FRAC - EXP_FRAC - 1);
-						if (sign < 0) result = -result;
 						/* Normalize */
-						working = (unsigned long)((result >> (INT_FRAC - EXP_FRAC)) % (1 << EXP_FULL));
+						result >>= (INT_FRAC - EXP_FRAC);
+						if (sign < 0) result = -result;
 						/* Output in .BYTE format */
 						for (j = 0; j < EXP_FULL; j += CHAR_BIT)
 						{
-							printf("%s$%02lX", s, working & 0xff);
-							working >>= CHAR_BIT;
+							printf("%s$%02llX", s, result & 0xff);
+							result >>= CHAR_BIT;
 							s = ", ";
 						}
 						break;
