@@ -4,7 +4,7 @@ Advances some ideas using Steve Wozniak’s 6502 SWEET16 interpreted byte-code l
 
 For example:
 
-* native type is equivalent to fixed decimal ######.###
+* native type is equivalent to fixed-point decimal ±######.###
 * easier support for banked memory
 * easier support for higher language compilers
 * arithmetic operations add, subtract, multiply, divide, and modulus
@@ -40,7 +40,7 @@ Right now, for testing purposes, the code builds everything into one file `syste
 
 To build and run:
 
-    make
+    make all
     make run
 
 The makefiles use `re2c`, `flex`, `bison`, `gcc`, `cpp`, and `xa`. Will eventually provide a `./configure`.
