@@ -6,9 +6,9 @@
 ; to be able to recognize an overflow/underflow situation, rescale the arguments, and repeat the
 ; calculation.
 
-; Largest value:              $3fffffff or  1048575.999(5)
+; Largest value:              $3fffffff or +1048575.999(5)
 ; Smallest value:             $c0000000 or -1048576.000(0)
-; Largest value for DEC/HEX:  $3d08ffff or   999999.999
+; Largest value for DEC/HEX:  $3d08ffff or  +999999.999
 ; Smallest value for DEC/HEX: $c2f70001 or  -999999.999
 
 ; Instructions
