@@ -299,12 +299,15 @@ _2	INC _PCL	; advance PC
 _3	RTS
 .)
 
-_RETZD	.(		; clears register D, falls through to _TRFDR
+_RETZD	.(		; clears register D, clears underflow, falls through to _TRFDR
 	LDA #0
 	STA _RD
 	STA _RD+1
 	STA _RD+2
 	STA _RD+3
+	LDA _F		; clear underflow
+	AND #_F_U^$FF
+	STA _F
 .)
 
 _TRFDR	.(		; pulls X, transfers RD to X as r register, updates overflow flag
@@ -424,10 +427,10 @@ _1	LDA _R0,Y	; check for zero argument
 	BNE _2		; q is non-zero
 	JMP _RETZD	; q is zero, return zero
 _2	LDA _R0+3,X	; save sign of register p
-	AND #%11000000
+	AND #_MSK_O
 	PHA
 	EOR _R0+3,Y
-	AND #%11000000	; save sign of product
+	AND #_MSK_O	; save sign of product
 	PHA
 	JSR _TRFQD
 	TXA
@@ -511,8 +514,173 @@ _8	PLA		; reset the sign of register p
 _9	JMP _TRFDR	; pull X, transfer RD to r register, let it handle the return
 .)
 
+_CMPDC	.(		; compare D to C, return result in status
+	LDA _RD+3
+	CMP _RC+3
+	BCC _1		; definitely less
+	BNE _1		; definitely greater
+	LDA _RD+2
+	CMP _RC+2
+	BCC _1		; definitely less
+	BNE _1		; definitely greater
+	LDA _RD+1
+	CMP _RC+1
+	BCC _1		; definitely less
+	BNE _1		; definitely greater
+	LDA _RD
+	CMP _RC
+_1	RTS
+.)
+
 _DIV	.(		; DIV r pq		dr pq		Rr <- Rp / Rq	- division
-	RTS
+	TXA
+	PHA		; save r register for later
+	JSR _GETPQ
+	LDA _R0,X	; check for zero argument
+	ORA _R0+1,X
+	ORA _R0+2,X
+	ORA _R0+3,X
+	BNE _1		; p is non-zero
+	JMP _RETZD	; p is zero, return zero
+_1	LDA _R0,Y	; check for zero argument
+	ORA _R0+1,Y
+	ORA _R0+2,Y
+	ORA _R0+3,Y
+	BNE _2		; q is non-zero
+	BRK		; q is zero, abort and call exception handler (TODO)
+_2	LDA _R0,X	; copy p to RD
+	STA _RD
+	LDA _R0+1,X
+	STA _RD+1
+	LDA _R0+2,X
+	STA _RD+2
+	LDA _R0+3,X
+	STA _RD+3
+	LDA _R0,Y	; copy q to RC
+	STA _RC
+	LDA _R0+1,Y
+	STA _RC+1
+	LDA _R0+2,Y
+	STA _RC+2
+	LDA _R0+3,Y
+	STA _RC+3
+	LDA #0		; set RB to 1
+	STA _RB
+	LDA #_PLS_1
+	STA _RB+1
+	LDA #0
+	STA _RB+2
+	STA _RB+3
+	PLA		; restore r register
+	TAX
+	LDA #0		; set r to 0
+	STA _R0,X
+	STA _R0+1,X
+	STA _R0+2,X
+	STA _R0+3,X
+	LDA _RD+3	; save sign of quotient
+	EOR _RC+3
+	AND #_MSK_O
+	PHA
+	LDY #_RD-_R0	; absolute value of register p saved in D
+	JSR _ABSRY
+	LDY #_RC-_R0	; absolute value of register q saved in C
+	JSR _ABSRY
+_3	JSR _CMPDC	; is D < C?
+	BCC _4		; yes, continue
+	BEQ _5		; D = C
+	ASL _RC		; RC *= 2
+	ROL _RC+1
+	ROL _RC+2
+	ROL _RC+3
+	ASL _RB		; RB *= 2
+	ROL _RB+1
+	ROL _RB+2
+	ROL _RB+3
+	BCC _3
+	; carry is set, means a real overflow condition
+	LDA _R0+3,X
+	ORA #_F_O
+	STA _R0+3,X
+	BEQ _4
+	JMP _9
+_4	LDA _RB		; is RB > 0?
+	ORA _RB+1
+	ORA _RB+2
+	ORA _RB+3
+	BEQ _7		; no, done
+	JSR _CMPDC	; is D >= C?
+	BCC _6		; no, skip subtraction
+_5	SEC		; RD -= RC
+	LDA _RD
+	SBC _RC
+	STA _RD
+	LDA _RD+1
+	SBC _RC+1
+	STA _RD+1
+	LDA _RD+2
+	SBC _RC+2
+	STA _RD+2
+	LDA _RD+3
+	SBC _RC+3
+	STA _RD+3
+	CLC		; RX += RB
+	LDA _R0,X
+	ADC _RB
+	STA _R0,X
+	LDA _R0+1,X
+	ADC _RB+1
+	STA _R0+1,X
+	LDA _R0+2,X
+	ADC _RB+2
+	STA _R0+2,X
+	LDA _R0+3,X
+	ADC _RB+3
+	STA _R0+3,X
+	LDA _RD		; is RD > 0?
+	ORA _RD+1
+	ORA _RD+2
+	ORA _RD+3
+	BEQ _7		; no, done
+_6	CLC		; RC /= 2
+	ROR _RC+3
+	ROR _RC+2
+	ROR _RC+1
+	ROR _RC
+	CLC		; RB /= 2
+	ROR _RB+3
+	ROR _RB+2
+	ROR _RB+1
+	ROR _RB
+	JMP _4
+_7	LDA _R0,X	; check for underflow
+	ORA _R0+1,X
+	ORA _R0+2,X
+	ORA _R0+3,X
+	BNE _8		; non-zero result means no underflow
+	LDA _F		; we checked earlier for zero operands, so a zero result means underflow, set underflow
+	ORA #_F_U
+	STA _F
+	BNE _A
+_8	LDA _F		; clear underflow
+	AND #_F_U^$FF
+	STA _F
+_9	LDA _R0+3,X	; check for overflow
+	AND #_MSK_O
+	BEQ _A		; all zero, no overflow
+	LDA _F		; set overflow
+	ORA #_F_O
+	STA _F
+	BNE _B
+_A	LDA _F		; clear overflow
+	AND #_F_O^$FF
+	STA _F
+_B	PLA		; set the sign of quotient
+	BEQ _C
+	TXA
+	TAY
+	JSR _NEGRY
+_C	RTS
 .)
 
 _MOD	.(		; MOD r pq		er pq		Rr <- Rp % Rq	- modulus
