@@ -599,10 +599,12 @@ _3	JSR _CMPDC	; is D < C?
 	ROL _RB+3
 	BCC _3
 	; carry is set, means a real overflow condition
-	LDA _R0+3,X
-	ORA #_F_O
+	LDA #$FF	; set to the maximum
+	STA _R0,X
+	STA _R0+1,X
+	STA _R0+2,X
+	LDA #_MAX_V|_F_O
 	STA _R0+3,X
-	BEQ _4
 	JMP _9
 _4	LDA _RB		; is RB > 0?
 	ORA _RB+1

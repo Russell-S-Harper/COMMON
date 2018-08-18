@@ -131,6 +131,7 @@ _MOD_C	= $e0
 _EXT_C	= $f0
 
 ; common constants
+_MAX_V	= $3f		; i.e. the $3f part of $3fffffff
 
 ; plus and minus 1 for increment and decrement
 _PLS_1	= %00000100	; i.e. the $04 part of $00000400
