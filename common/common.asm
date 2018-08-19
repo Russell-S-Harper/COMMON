@@ -514,25 +514,7 @@ _8	PLA		; reset the sign of register p
 _9	JMP _TRFDR	; pull X, transfer RD to r register, let it handle the return
 .)
 
-_CMPDC	.(		; compare D to C, return result in status
-	LDA _RD+3
-	CMP _RC+3
-	BCC _1		; definitely less
-	BNE _1		; definitely greater
-	LDA _RD+2
-	CMP _RC+2
-	BCC _1		; definitely less
-	BNE _1		; definitely greater
-	LDA _RD+1
-	CMP _RC+1
-	BCC _1		; definitely less
-	BNE _1		; definitely greater
-	LDA _RD
-	CMP _RC
-_1	RTS
-.)
-
-_DIV	.(		; DIV r pq		dr pq		Rr <- Rp / Rq	- division
+_INTDM	.(		; initialize for DIV and MOD, returns sign of result in A
 	TXA
 	PHA		; save r register for later
 	JSR _GETPQ
@@ -578,42 +560,32 @@ _2	LDA _R0,X	; copy p to RD
 	STA _R0+1,X
 	STA _R0+2,X
 	STA _R0+3,X
-	LDA _RD+3	; save sign of quotient
+	LDA _RD+3	; get sign of result
 	EOR _RC+3
 	AND #_MSK_O
-	PHA
-	LDY #_RD-_R0	; absolute value of register p saved in D
-	JSR _ABSRY
-	LDY #_RC-_R0	; absolute value of register q saved in C
-	JSR _ABSRY
-_3	JSR _CMPDC	; is D < C?
-	BCC _4		; yes, continue
-	BEQ _5		; D = C
-	ASL _RC		; RC *= 2
-	ROL _RC+1
-	ROL _RC+2
-	ROL _RC+3
-	ASL _RB		; RB *= 2
-	ROL _RB+1
-	ROL _RB+2
-	ROL _RB+3
-	BCC _3
-	; carry is set, means a real overflow condition
-	LDA #$FF	; set to the maximum
-	STA _R0,X
-	STA _R0+1,X
-	STA _R0+2,X
-	LDA #_MAX_V|_F_O
-	STA _R0+3,X
-	JMP _9
-_4	LDA _RB		; is RB > 0?
-	ORA _RB+1
-	ORA _RB+2
-	ORA _RB+3
-	BEQ _7		; no, done
-	JSR _CMPDC	; is D >= C?
-	BCC _6		; no, skip subtraction
-_5	SEC		; RD -= RC
+	RTS
+.)
+
+_CMPDC	.(		; compare D to C, return result in status
+	LDA _RD+3
+	CMP _RC+3
+	BCC _1		; definitely less
+	BNE _1		; definitely greater
+	LDA _RD+2
+	CMP _RC+2
+	BCC _1		; definitely less
+	BNE _1		; definitely greater
+	LDA _RD+1
+	CMP _RC+1
+	BCC _1		; definitely less
+	BNE _1		; definitely greater
+	LDA _RD
+	CMP _RC
+_1	RTS
+.)
+
+_UPDDM	.(		; update DIV and MOD
+	SEC		; RD -= RC
 	LDA _RD
 	SBC _RC
 	STA _RD
@@ -639,12 +611,23 @@ _5	SEC		; RD -= RC
 	LDA _R0+3,X
 	ADC _RB+3
 	STA _R0+3,X
-	LDA _RD		; is RD > 0?
-	ORA _RD+1
-	ORA _RD+2
-	ORA _RD+3
-	BEQ _7		; no, done
-_6	CLC		; RC /= 2
+	RTS
+.)
+
+_SHUDM	.(		; shift up for DIV and MOD
+	ASL _RC		; RC *= 2
+	ROL _RC+1
+	ROL _RC+2
+	ROL _RC+3
+	ASL _RB		; RB *= 2
+	ROL _RB+1
+	ROL _RB+2
+	ROL _RB+3
+	RTS
+.)
+
+_SHDDM	.(		; shift down for DIV and MOD
+	CLC		; RC /= 2
 	ROR _RC+3
 	ROR _RC+2
 	ROR _RC+1
@@ -654,6 +637,43 @@ _6	CLC		; RC /= 2
 	ROR _RB+2
 	ROR _RB+1
 	ROR _RB
+	RTS
+.)
+
+_DIV	.(		; DIV r pq		dr pq		Rr <- Rp / Rq	- division
+	JSR _INTDM	; initialize
+	PHA		; save sign of result
+	LDY #_RD-_R0	; absolute value of register p saved in D
+	JSR _ABSRY
+	LDY #_RC-_R0	; absolute value of register q saved in C
+	JSR _ABSRY
+_3	JSR _CMPDC	; is D < C?
+	BCC _4		; yes, continue
+	BEQ _5		; D = C
+	JSR _UPDDM	; confirmed D > C, so RD -= RC, RX += RB
+	JSR _SHUDM	; shift up
+	BCC _3		; if carry is set, means a really bad overflow condition
+	LDA #$FF	; set to the maximum
+	STA _R0,X
+	STA _R0+1,X
+	STA _R0+2,X
+	LDA #_MAX_V|_F_O
+	STA _R0+3,X
+	BNE _9
+_4	LDA _RB		; is RB > 0?
+	ORA _RB+1
+	ORA _RB+2
+	ORA _RB+3
+	BEQ _7		; no, done
+	JSR _CMPDC	; is D >= C?
+	BCC _6		; no, skip subtraction
+_5	JSR _UPDDM	; RD -= RC, RX += RB
+	LDA _RD		; is RD > 0?
+	ORA _RD+1
+	ORA _RD+2
+	ORA _RD+3
+	BEQ _7		; no, done
+_6	JSR _SHDDM	; shift down
 	JMP _4
 _7	LDA _R0,X	; check for underflow
 	ORA _R0+1,X
@@ -686,7 +706,66 @@ _C	RTS
 .)
 
 _MOD	.(		; MOD r pq		er pq		Rr <- Rp % Rq	- modulus
-	RTS
+	JSR _INTDM	; initialize
+	PHA		; save sign of result
+	LDY #_RD-_R0	; absolute value of register p saved in D
+	JSR _ABSRY
+	LDY #_RC-_R0	; absolute value of register q saved in C
+	JSR _ABSRY
+_3	JSR _CMPDC	; is D < C?
+	BCC _4		; yes, continue
+	BEQ _5		; D = C
+	JSR _UPDDM	; confirmed D > C, so RD -= RC, RX += RB
+	JSR _SHUDM	; shift up
+	BCC _3		; if carry is set, means a really bad overflow condition
+	LDA #1		; set to "overflowed non-zero"
+	STA _R0,X
+	LDA #0
+	STA _R0+1,X
+	STA _R0+2,X
+	ORA #_F_O
+	STA _R0+3,X
+	BNE _9
+_4	LDA _RB+1	; is RB < 1?
+	CMP #_PLS_1
+	BCC _7		; yes, done
+	JSR _CMPDC	; is D >= C?
+	BCC _6		; no, skip subtraction
+_5	JSR _UPDDM	; RD -= RC, RX += RB
+	LDA _RD		; is RD > 0?
+	ORA _RD+1
+	ORA _RD+2
+	ORA _RD+3
+	BEQ _7		; no, done
+_6	JSR _SHDDM	; shift down
+	JMP _4
+_7	LDA _RD		; transfer RD to RX
+	STA _R0,X
+	LDA _RD+1
+	STA _R0+1,X
+	LDA _RD+2
+	STA _R0+2,X
+	LDA _RD+3
+	STA _R0+3,X
+_8	LDA _F		; clear underflow
+	AND #_F_U^$FF
+	STA _F
+_9	LDA _R0+3,X	; check for overflow
+	AND #_MSK_O
+	BEQ _A		; all zero, no overflow
+	LDA _F		; set overflow
+	ORA #_F_O
+	STA _F
+	BNE _B
+_A	LDA _F		; clear overflow
+	AND #_F_O^$FF
+	STA _F
+_B	PLA		; set the sign of modulus
+	BEQ _C
+	TXA
+	TAY
+	JSR _NEGRY
+_C	RTS
 .)
 	
 _ESC	.(		; ESC			00				- escape back into regular assembler
