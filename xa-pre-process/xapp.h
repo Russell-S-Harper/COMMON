@@ -46,7 +46,7 @@
 #define TOKEN_LEN	256
 #endif /* TOKEN_LEN */
 #define TOKENS		128
-#define IO_BUFFER	(TOKENS * TOKEN_LEN)	
+#define IO_BUFFER	(TOKENS * TOKEN_LEN)
 
 typedef enum
 {

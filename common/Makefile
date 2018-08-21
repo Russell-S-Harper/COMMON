@@ -10,5 +10,5 @@ page6.obj: rom.h macros.h page6.src
 	cpp -P page6.src | $(XAPP) > page6.asm
 	xa -M page6.asm -l page6.lbl -o page6.obj
 
-clean: 
+clean:
 	rm -f page6.asm common.obj page6.obj common.lbl page6.lbl system.obj
