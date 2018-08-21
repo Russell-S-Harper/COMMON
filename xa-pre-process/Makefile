@@ -6,5 +6,5 @@ $(TGT): main.c $(TGT).h $(TGT).re $(TGT).l $(TGT).y
 	bison -d $(TGT).y
 	gcc main.c $(TGT).c $(TGT).tab.c $(TGT).yy.c -lfl -lm -o $(TGT)
 
-clean: 
+clean:
 	rm -f $(TGT).c $(TGT).yy.h $(TGT).yy.c $(TGT).tab.h $(TGT).tab.c $(TGT)

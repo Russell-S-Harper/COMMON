@@ -26,10 +26,19 @@ void hook() {
 	int i, j;
 
 	printf("\n%04x %u %u\n", pc, instructions, clockticks6502);
-	for (i = 0x00c0; i < 0x0100; i += 16) {
-		printf("%04x ", i);
-		for (j = 0; j < 16; ++j)
-			printf("%02x%s", memory[i + j], (i + j + 1) % 16? " ": "\n");
+	for (i = 0x00b8; i < 0x00d8; i += 4) {
+		printf("R%d: ", (i - 0x00b8) / 4);
+		for (j = 0; j < 4; ++j)
+			printf("%02x ", memory[i + j]);
+		if (((i - 0x00b8) / 4) % 4 == 3)
+			printf("\n");
+	}
+	for (i = 0x00e0; i < 0x0100; i += 4) {
+		printf("I%d: ", (i - 0x00e0) / 4);
+		for (j = 0; j < 4; ++j)
+			printf("%02x ", memory[i + j]);
+		if (((i - 0x00e0) / 4) % 4 == 3)
+			printf("\n");
 	}
 }
 

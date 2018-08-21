@@ -21,7 +21,7 @@ int tokenizeInput(const char *cursor, TOKEN *tokens)
 		re2c:indent:top = 2;
 		re2c:yyfill:enable = 0;
 		re2c:yych:conversion = 1;
-	
+
 		BELL						= "\x07" ;
 		BACKSPACE					= "\x08" ;
 		HORIZONTAL_TAB					= "\x09" ;
@@ -31,7 +31,7 @@ int tokenizeInput(const char *cursor, TOKEN *tokens)
 		CARRIAGE_RETURN					= "\x0d" ;
 		ESCAPE						= "\x1b" ;
 		DELETE						= "\x7f" ;
-	
+
 		SPACE						= "\x20" ;
 		EXCLAMATION_MARK				= "\x21" ;
 		QUOTATION_MARK					= "\x22" ;
@@ -65,24 +65,24 @@ int tokenizeInput(const char *cursor, TOKEN *tokens)
 		VERTICAL_LINE					= "\x7c" ;
 		RIGHT_CURLY_BRACKET				= "\x7d" ;
 		TILDE						= "\x7e" ;
-	
+
 		DIGIT		= [0-9] ;
-	
+
 		LETTER		= [A-Za-z] ;
-	
+
 		WHITE_SPACE	= BELL | BACKSPACE | HORIZONTAL_TAB | ESCAPE | DELETE | SPACE ;
-	
+
 		VALID		= DIGIT | LETTER | EXCLAMATION_MARK | DOLLAR_SIGN | PERCENT_SIGN | AMPERSAND
 					| LEFT_PARENTHESIS | RIGHT_PARENTHESIS | ASTERISK | PLUS_SIGN | HYPHEN_MINUS
 					| FULL_STOP | SOLIDUS | LESS_THAN_SIGN | EQUALS_SIGN | GREATER_THAN_SIGN
 					| LOW_LINE | VERTICAL_LINE | TILDE | WHITE_SPACE ;
-	
+
 		COMMAND		= LOW_LINE [Ss][Ee][Tt] LOW_LINE [Vv] WHITE_SPACE* LEFT_PARENTHESIS WHITE_SPACE* QUOTATION_MARK VALID+ QUOTATION_MARK WHITE_SPACE* RIGHT_PARENTHESIS ;
-	
+
 		DEFAULT		= . ;
-	
+
 		END_OF_LINE	= ( LINE_FEED | VERTICAL_TAB | FORM_FEED | CARRIAGE_RETURN )+ ;
-	
+
 		COMMAND		{ i = copyToken(tokens, i, TT_COMMAND, token, (int)(cursor - token)); continue; }
 		DEFAULT		{ i = copyToken(tokens, i, TT_DEFAULT, token, (int)(cursor - token)); continue; }
 		WHITE_SPACE	{ i = copyToken(tokens, i, TT_WHITE_SPACE, token, (int)(cursor - token)); continue; }

@@ -3,7 +3,7 @@
 #ifndef __MACROS_H
 #define __MACROS_H
 
-; registers
+; common registers
 #define	R0		0
 #define	R1		1
 #define	R2		2
@@ -14,12 +14,6 @@
 #define	R7		7
 #define	R8		8
 #define	R9		9
-#define	RA		10
-#define	RB		11
-#define	RC		12
-#define	RD		13
-#define	RE		14
-#define	RF		15
 
 ; system functions
 #define	S0		0
@@ -32,12 +26,6 @@
 #define	S7		7
 #define	S8		8
 #define	S9		9
-#define	SA		10
-#define	SB		11
-#define	SC		12
-#define	SD		13
-#define	SE		14
-#define	SF		15
 
 ; user functions
 #define	U0		15
@@ -50,12 +38,6 @@
 #define	U7		8
 #define	U8		7
 #define	U9		6
-#define	UA		5
-#define	UB		4
-#define	UC		3
-#define	UD		2
-#define	UE		1
-#define	UF		0
 
 ; macros
 #define ESC		.BYTE _ESC_C

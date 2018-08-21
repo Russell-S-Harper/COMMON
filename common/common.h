@@ -46,8 +46,8 @@
 ; SVI pq		0e pq		(int(Rp)) <- Rq	- save indirect to memory
 ; CMR pq		0f pq		F <- Rp <=> Rq	- compare registers
 
-; 64 bytes in page zero for common registers
-_R0	= $c0
+; 40 bytes in page zero for common registers
+_R0	= $b8
 _R1	= _R0 + 4
 _R2	= _R1 + 4
 _R3	= _R2 + 4
@@ -57,16 +57,20 @@ _R6	= _R5 + 4
 _R7	= _R6 + 4
 _R8	= _R7 + 4
 _R9	= _R8 + 4
-_RA	= _R9 + 4
-_RB	= _RA + 4	; workspace for MUL, DIV, and MOD
-_RC	= _RB + 4	; as above
-_RD	= _RC + 4	; as above and for ADD, SUB, and EXC
-_RE	= _RD + 4	; register E maintains common status
-_RF	= _RE + 4	; register F saves/restores processor status
 
-; register E maintains common status
+; 32 bytes in page zero for internal registers
+_I0	= $e0		; workspace for ADD, SUB, MUL, DIV, MOD, EXC
+_I1	= _I0 + 4
+_I2	= _I1 + 4
+_I3	= _I2 + 4
+_I4	= _I3 + 4
+_I5	= _I4 + 4
+_I6	= _I5 + 4	; register I6 maintains common status
+_I7	= _I6 + 4	; register I7 saves/restores processor status
+
+; register I6 maintains common status
 ; (dd cc bb aa) aa: index for register stack RS / ccbb: program counter PC / dd: flags F UONPZLGE
-_RSI	= _RE		; register stack index
+_RSI	= _I6		; register stack index
 _PCL	= _RSI + 1	; program counter low
 _PCH	= _PCL + 1	; program counter high
 _F	= _PCH + 1	; flags
@@ -82,9 +86,9 @@ _F_N	=  32		; if Rr < 0.0 (after TST)
 _F_O	=  64		; if overflow (after arithmetic operations)
 _F_U	= 128		; if underflow (after arithmetic operations)
 
-; register F saves/restores processor status
+; register I7 saves/restores processor status
 ; (dd cc bb aa) aa: accumulator, bb: index X, cc: index Y, dd: processor status
-_ACC	= _RF		; saved accumulator to restore
+_ACC	= _I7		; saved accumulator to restore
 _IDX	= _ACC + 1	; saved index X to restore
 _IDY	= _IDX + 1	; saved index Y to restore
 _PS	= _IDY + 1	; saved processor status to restore
