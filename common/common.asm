@@ -43,7 +43,7 @@ _3	TAX		; save operand for later
 	ASL		; shift to get offset to register
 	ASL
 	TAX		; back to index
-	RTS		; "return" to routine
+	RTS		; "return" to routine	
 _4	TXA		; get operand
 	ASL		; shift to get offset to 0X instructions
 	TAY
@@ -52,7 +52,7 @@ _4	TXA		; get operand
 	LDA FN_0X,Y	; push low address
 	PHA
 	TXA		; restore operand
-	RTS		; "return" to routine
+	RTS		; "return" to routine	
 _5	TXA		; get operand
 	AND #$F		; mask to get index
 	ASL		; shift to get offset to FX instructions
@@ -408,7 +408,7 @@ _ABSX	.(		; sets register at X to absolute value
 	RTS
 .)
 
-_BKRRD	.(		; implement banker's rounding on quadword pointed by X
+_BKRRD	.(		; implement banker's rounding on quad-word pointed by X
 
 	; The logic table below shows the expected results. The only differences are
 	; when the least significant byte (LSB) is 128 and the second byte (2B) is even
@@ -736,7 +736,7 @@ _6	JMP _RETI0X	; pull X, transfer I0 to r register, let it handle the return
 _MOD	.(
 	RTS
 .)
-
+	
 _ESC	.(		; ESC			00				- escape back into regular assembler
 	PLA		; discard the COMMON _1 return address
 	PLA
