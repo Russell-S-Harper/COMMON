@@ -20,8 +20,8 @@
 ; INR r			5r		Rr <- Rr + 1.0	- increment register
 ; DCR r			6r		Rr <- Rr - 1.0	- decrement register
 ; TST r			7r		F <- Rr <=> 0.0	- test register
-; DEC r			8r		Rr <- dec(Rr)	- convert Rr from hex aabbccdd to decimal #########
-; HEX r			9r		Rr <- hex(Rr)	- convert Rr from decimal ######### to hex aabbccdd
+; DEC r			8r		Rr <- dec(Rr)	- convert Rr from hex aabbccdd to decimal ######.###
+; HEX r			9r		Rr <- hex(Rr)	- convert Rr from decimal ######.### to hex aabbccdd
 ; ADD r pq		ar pq		Rr <- Rp + Rq	- addition
 ; SUB r pq		br pq		Rr <- Rp - Rq	- subtraction
 ; MUL r pq		cr pq		Rr <- Rp * Rq	- multiplication

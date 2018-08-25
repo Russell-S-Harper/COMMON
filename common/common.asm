@@ -261,11 +261,11 @@ _3	ORA _F
 	RTS
 .)
 
-_DEC	.(		; DEC r			8r		Rr <- dec(Rr)	- convert Rr from hex aabbcc.dd to decimal ######.##
+_DEC	.(		; DEC r			8r		Rr <- dec(Rr)	- convert Rr from hex aabbccdd to decimal ######.###
 	RTS
 .)
 
-_HEX	.(		; HEX r			9r		Rr <- hex(Rr)	- convert Rr from decimal ######.## to hex aabbcc.dd
+_HEX	.(		; HEX r			9r		Rr <- hex(Rr)	- convert Rr from decimal ######.### to hex aabbccdd
 	RTS
 .)
 
@@ -604,7 +604,7 @@ _2	JSR _CPXI0	; copy p to I0
 	STA _I3+2
 	LDA _R0+3,Y
 	STA _I3+3
-	; I4 / I5 will form 64-bit result
+	; I4 / I5 will form 64-bit result for DIV
 	LDX #_I4-_R0
 	JSR _ZERQX
 	LDA _I0+3	; get sign of result
@@ -613,37 +613,37 @@ _2	JSR _CPXI0	; copy p to I0
 	RTS
 .)
 
-_CMPDM	.(		; compare I0/I1 to I2/I3, return result in status
+_CPQXDM	.(		; compare I0/I1 to quadword pointed by X, return result in status
 	LDA _I1+3
-	CMP _I3+3
+	CMP _R1+3,X
 	BCC _1		; definitely less
 	BNE _1		; definitely greater
 	LDA _I1+2
-	CMP _I3+2
+	CMP _R1+2,X
 	BCC _1		; definitely less
 	BNE _1		; definitely greater
 	LDA _I1+1
-	CMP _I3+1
+	CMP _R1+1,X
 	BCC _1		; definitely less
 	BNE _1		; definitely greater
 	LDA _I1
-	CMP _I3
+	CMP _R1,X
 	BCC _1		; definitely less
 	BNE _1		; definitely greater
 	LDA _I0+3
-	CMP _I2+3
+	CMP _R0+3,X
 	BCC _1		; definitely less
 	BNE _1		; definitely greater
 	LDA _I0+2
-	CMP _I2+2
+	CMP _R0+2,X
 	BCC _1		; definitely less
 	BNE _1		; definitely greater
 	LDA _I0+1
-	CMP _I2+1
+	CMP _R0+1,X
 	BCC _1		; definitely less
 	BNE _1		; definitely greater
 	LDA _I0
-	CMP _I2
+	CMP _R0,X
 _1	RTS
 .)
 
@@ -711,7 +711,8 @@ _DIV	.(		; DIV r pq		dr pq		Rr <- Rp / Rq	- division
 	LDX #_I3-_R0	; absolute value of register q saved in I3
 	JSR _ABSX
 	LDY #51		; 51 bits are enough, and ensure alignment
-_1	JSR _CMPDM	; is I0/I1 < I2/I3
+_1	LDX #_I2-_R0	; is I0/I1 < I2/I3
+	JSR _CPQXDM
 	BCC _2		; yes, skip subtraction
 	BEQ _4		; special case when p = q
 	JSR _UPDDM	; I0/I1 -= I2/I3
@@ -733,10 +734,44 @@ _5	LDX #_I4-_R0
 _6	JMP _RETI0X	; pull X, transfer I0 to r register, let it handle the return
 .)
 
-_MOD	.(
-	RTS
+_MOD	.(		; MOD r pq		er pq		Rr <- Rp % Rq	- modulus
+	TXA
+	PHA		; save r register for later
+	JSR _INTDM	; initialize
+	PHA		; save sign of result
+	LDX #_I0-_R0	; absolute value of register p saved in I0
+	JSR _ABSX
+	LDX #_I3-_R0	; absolute value of register q saved in I3
+	JSR _ABSX
+	LDA _I3		; copy |q| in I3 to I4
+	STA _I4
+	LDA _I3+1
+	STA _I4+1
+	LDA _I3+2
+	STA _I4+2
+	LDA _I3+3
+	STA _I4+3
+	LDY #34		; 34 shifts are enough
+_1	LDX #_I4-_R0	; is I0/I1 < I4/I5?
+	JSR _CPQXDM
+	BCC _3		; yes, all done
+	LDX #_I2-_R0	; is I0/I1 < I2/I3
+	JSR _CPQXDM
+	BCC _2		; yes, skip subtraction
+	JSR _UPDDM	; I0/I1 -= I2/I3
+_2	JSR _SHDDM	; I2/I3 /= 2
+	DEY
+	BNE _1
+_3	LDA _F		; clear underflow
+	AND #_F_U^$FF
+	STA _F
+	PLA		; set the sign of the product
+	BEQ _4
+	LDX #_I0-_R0	; negate I0
+	JSR _NEGX
+_4	JMP _RETI0X	; pull X, transfer I0 to r register, let it handle the return
 .)
-	
+
 _ESC	.(		; ESC			00				- escape back into regular assembler
 	PLA		; discard the COMMON _1 return address
 	PLA
