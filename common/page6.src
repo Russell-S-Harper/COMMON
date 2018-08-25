@@ -5,10 +5,10 @@
 
 HDR(DEMO)
 	CMN
-	SET(R0, 1048575.9995)
-	SET(R1, 3)
-	DIV(R2, R0, R1)
-	MUL(R3, R2, R1)
+	SET(R0, 1048575)
+	SET(R1, 3 * 5 * 5)
+	MOD(R2, R0, R1)
+	;SUB(R3, R0, R2)
 	ESC
 	BRK
 
