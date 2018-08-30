@@ -59,7 +59,7 @@ _R8	= _R7 + 4
 _R9	= _R8 + 4
 
 ; 32 bytes in page zero for internal registers
-_I0	= $e0		; workspace for ADD, SUB, MUL, DIV, MOD, EXC
+_I0	= $e0		; workspace for ADD, SUB, MUL, DIV, MOD, EXC, LDI, SVI
 _I1	= _I0 + 4
 _I2	= _I1 + 4
 _I3	= _I2 + 4
