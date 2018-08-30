@@ -269,7 +269,7 @@ _HEX	.(		; HEX r			9r		Rr <- hex(Rr)	- convert Rr from decimal ######.### to hex
 	RTS
 .)
 
-_GETPQ	.(		; sets X as p register and Y as q register, checks for overflow in the operands, advances PC
+_GETPQ	.(		; sets X as p register and Y as q register, advances PC
 	LDY #0
 	LDA (_PC),Y	; get source registers
 	LSR
@@ -281,6 +281,14 @@ _GETPQ	.(		; sets X as p register and Y as q register, checks for overflow in th
 	ASL
 	AND #_MSK_R	; q register
 	TAY
+_2	INC _PCL	; advance PC
+	BNE _3
+	INC _PCH
+_3	RTS
+.)
+
+_GETPQF	.(		; sets X as p register and Y as q register, advances PC, checks for overflow in the operands
+	JSR _GETPQ
 	LDA _R0+3,X
 	AND #_MSK_O	; check for existing overflow condition
 	BEQ _1		; sign and overflow are both clear
@@ -293,10 +301,7 @@ _1	LDA _R0+3,Y
 	EOR #_MSK_O
 	BEQ _2		; sign and overflow are both set
 	BRK		; an operand is in an overflow condition, abort and call exception handler (TODO)
-_2	INC _PCL	; advance PC
-	BNE _3
-	INC _PCH
-_3	RTS
+_2	RTS
 .)
 
 _ZERI0	.(		; clears I0
@@ -348,7 +353,7 @@ _2	RTS
 _ADD	.(		; ADD r pq		ar pq		Rr <- Rp + Rq	- addition
 	TXA
 	PHA		; save r register for later
-	JSR _GETPQ
+	JSR _GETPQF
 	CLC		; set I0 to Rp + Rq
 	LDA _R0,X
 	ADC _R0,Y
@@ -368,7 +373,7 @@ _ADD	.(		; ADD r pq		ar pq		Rr <- Rp + Rq	- addition
 _SUB	.(		; SUB r pq		br pq		Rr <- Rp - Rq	- subtraction
 	TXA
 	PHA		; save r register for later
-	JSR _GETPQ
+	JSR _GETPQF
 	SEC		; set I0 to Rp - Rq
 	LDA _R0,X
 	SBC _R0,Y
@@ -460,6 +465,18 @@ _CPXI0	.(		; copy four bytes at X index to I0, returns MSB in A
 	RTS
 .)
 
+_CPYI1	.(		; copy four bytes at Y index to I1, returns MSB in A
+	LDA _R0,Y
+	STA _I1
+	LDA _R0+1,Y
+	STA _I1+1
+	LDA _R0+2,Y
+	STA _I1+2
+	LDA _R0+3,Y
+	STA _I1+3
+	RTS
+.)
+
 _RDXFI0	.(		; using X index, round quad-word, transfer to I0, set overflow in I0, set or clear the underflow flag
 	JSR _BKRRD	; banker's rounding
 	INX		; skip extra fraction
@@ -491,7 +508,7 @@ _3	RTS
 _MUL	.(		; MUL r pq		cr pq		Rr <- Rp * Rq	- multiplication
 	TXA		; adapted from http://www.6502.org/source/integers/32muldiv.htm
 	PHA		; save r register for later
-	JSR _GETPQ
+	JSR _GETPQF
 	LDA _R0,X	; check for zero argument
 	ORA _R0+1,X
 	ORA _R0+2,X
@@ -509,14 +526,7 @@ _2	LDA _R0+3,X
 	AND #_MSK_O	; save sign of product
 	PHA
 	JSR _CPXI0	; transfer p to I0
-	LDA _R0,Y	; transfer q to I1
-	STA _I1
-	LDA _R0+1,Y
-	STA _I1+1
-	LDA _R0+2,Y
-	STA _I1+2
-	LDA _R0+3,Y
-	STA _I1+3
+	JSR _CPYI1	; transfer q to I1
 	LDX #_I0-_R0
 	JSR _ABSX	; set to absolute value
 	LDX #_I1-_R0
@@ -577,8 +587,8 @@ _ZERQX	.(		; zero quad-word (64 bits) at X
 	RTS
 .)
 
-_INTDM	.(		; initialize for DIV and MOD, returns sign of result in A
-	JSR _GETPQ
+_INIDM	.(		; initialize for DIV and MOD, returns sign of result in A
+	JSR _GETPQF
 	LDA _R0,X	; check for zero argument
 	ORA _R0+1,X
 	ORA _R0+2,X
@@ -704,7 +714,7 @@ _SHDDM	.(		; shift down for DIV and MOD
 _DIV	.(		; DIV r pq		dr pq		Rr <- Rp / Rq	- division
 	TXA
 	PHA		; save r register for later
-	JSR _INTDM	; initialize
+	JSR _INIDM	; initialize
 	PHA		; save sign of result
 	LDX #_I0-_R0	; absolute value of register p saved in I0
 	JSR _ABSX
@@ -737,7 +747,7 @@ _6	JMP _RETI0X	; pull X, transfer I0 to r register, let it handle the return
 _MOD	.(		; MOD r pq		er pq		Rr <- Rp % Rq	- modulus
 	TXA
 	PHA		; save r register for later
-	JSR _INTDM	; initialize
+	JSR _INIDM	; initialize
 	PHA		; save sign of result
 	LDX #_I0-_R0	; absolute value of register p saved in I0
 	JSR _ABSX
@@ -845,14 +855,70 @@ _BRU	.(		; BRU xxyy		0b yy xx	PC <- PC + xxyy	- branch if underflow (after arith
 .)
 
 _CPR	.(		; CPR pq		0c pq		Rp <- Rq	- copy register
+	JSR _GETPQ
+	LDA _R0,Y	; transfer q to p
+	STA _R0,X
+	LDA _R0+1,Y
+	STA _R0+1,X
+	LDA _R0+2,Y
+	STA _R0+2,X
+	LDA _R0+3,Y
+	STA _R0+3,X
+	RTS
+.)
+
+_INILS	.(		; common initialization for LDI and SVI
+	JSR _CPYI1	; copy q to I1
+	CLC		; shift to get an address
+	ROR _I1+3
+	ROR _I1+2
+	ROR _I1+1
+	CLC
+	ROR _I1+3
+	ROR _I1+2
+	ROR _I1+1
 	RTS
 .)
 
 _LDI	.(		; LDI pq		0d pq		Rp <- (Rq:bbcc)	- load indirect from memory
+	JSR _GETPQ
+	JSR _INILS
+	LDY #0		; transfer
+	LDA (_I1+1),Y
+	STA _R0,X
+	INY
+	LDA (_I1+1),Y
+	STA _R0+1,X
+	INY
+	LDA (_I1+1),Y
+	STA _R0+2,X
+	INY
+	LDA (_I1+1),Y
+	STA _R0+3,X
 	RTS
 .)
 
 _SVI	.(		; SVI pq		0e pq		(Rp:bbcc) <- Rq	- save indirect to memory
+	JSR _GETPQ
+	TXA		; swap X and Y
+	PHA		; X on stack
+	TYA
+	TAX		; X becomes Y
+	PLA
+	TAY		; pull Y (was X)
+	JSR _INILS
+	LDY #0		; transfer
+	LDA _R0,X
+	STA (_I1+1),Y
+	INY
+	LDA _R0+1,X
+	STA (_I1+1),Y
+	INY
+	LDA _R0+2,X
+	STA (_I1+1),Y
+	INY
+	LDA _R0+3,X
+	STA (_I1+1),Y
 	RTS
 .)
 
