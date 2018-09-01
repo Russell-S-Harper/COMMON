@@ -241,7 +241,15 @@ _DCR	.(		; DCR r			6r		Rr <- Rr - 1.0	- decrement register
 	BNE _ADDI0X
 .)
 
-_TST	.(		; TST r			7r		F <- Rr <=> 0.0	- test register
+_NEG	.(		; NEG r			7r		Rr <- -Rr	- negate register
+	RTS
+.)
+
+_INV	.(		; INV r			8r		Rr <- 1.0 / Rr	- multiplicative inverse of register
+	RTS
+.)
+
+_TST	.(		; TST r			9r		F <- Rr <=> 0.0	- test register
 	LDA _F
 	AND #_MSK_T	; clear TST bits
 	STA _F
@@ -258,14 +266,6 @@ _1	LDA #_F_N	; set negative flag
 _2	LDA #_F_P	; set positive flag
 _3	ORA _F
 	STA _F
-	RTS
-.)
-
-_DEC	.(		; DEC r			8r		Rr <- dec(Rr)	- convert Rr from hex aabbccdd to decimal ######.###
-	RTS
-.)
-
-_HEX	.(		; HEX r			9r		Rr <- hex(Rr)	- convert Rr from decimal ######.### to hex aabbccdd
 	RTS
 .)
 
@@ -936,8 +936,8 @@ _END_CMN_CD
 
 FN_0X	.WORD _ESC-1, _RTN-1, _BRS-1, _BRA-1, _BRE-1, _BRG-1, _BRL-1, _BRZ-1,
 	.WORD _BRP-1, _BRN-1, _BRO-1, _BRU-1, _CPR-1, _LDI-1, _SVI-1, _CMR-1
-FN_XR	.WORD _SET-1, _POP-1, _PSH-1, _EXC-1, _INR-1, _DCR-1, _TST-1,
-	.WORD _DEC-1, _HEX-1, _ADD-1, _SUB-1, _MUL-1, _DIV-1, _MOD-1
+FN_XR	.WORD _SET-1, _POP-1, _PSH-1, _EXC-1, _INR-1, _DCR-1, _NEG-1,
+	.WORD _INV-1, _TST-1, _ADD-1, _SUB-1, _MUL-1, _DIV-1, _MOD-1
 
 _END_CMN_DT
 

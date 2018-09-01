@@ -6,10 +6,11 @@
 ; to be able to recognize an overflow/underflow situation, rescale the arguments, and repeat the
 ; calculation.
 
-; Largest value:              $3fffffff or +1048575.999(5)
-; Smallest value:             $c0000000 or -1048576.000(0)
-; Largest value for DEC/HEX:  $3d08ffff or  +999999.999
-; Smallest value for DEC/HEX: $c2f70001 or  -999999.999
+;  Largest value: $3fffffff or +1048575.999(5)
+;       Plus one: $00000400
+;           Zero: $00000000
+;      Minus one: $fffffc00		
+; Smallest value: $c0000000 or -1048576.000(0)
 
 ; Instructions
 
@@ -19,9 +20,9 @@
 ; EXC r			4r		Rr <-> RS	- exchange Rr with stack
 ; INR r			5r		Rr <- Rr + 1.0	- increment register
 ; DCR r			6r		Rr <- Rr - 1.0	- decrement register
-; TST r			7r		F <- Rr <=> 0.0	- test register
-; DEC r			8r		Rr <- dec(Rr)	- convert Rr from hex aabbccdd to decimal ######.###
-; HEX r			9r		Rr <- hex(Rr)	- convert Rr from decimal ######.### to hex aabbccdd
+; NEG r			7r		Rr <- -Rr	- negate register
+; INV r			8r		Rr <- 1.0 / Rr	- multiplicative inverse of register
+; TST r			9r		F <- Rr <=> 0.0	- test register
 ; ADD r pq		ar pq		Rr <- Rp + Rq	- addition
 ; SUB r pq		br pq		Rr <- Rp - Rq	- subtraction
 ; MUL r pq		cr pq		Rr <- Rp * Rq	- multiplication
@@ -124,9 +125,9 @@ _POP_C	= $30
 _EXC_C	= $40
 _INR_C	= $50
 _DCR_C	= $60
-_TST_C	= $70
-_DEC_C	= $80
-_HEX_C	= $90
+_NEG_C	= $70
+_INV_C	= $80
+_TST_C	= $90
 _ADD_C	= $a0
 _SUB_C	= $b0
 _MUL_C	= $c0
