@@ -62,9 +62,9 @@
 #define EXC(r)		.BYTE _EXC_C + r
 #define INR(r)		.BYTE _INR_C + r
 #define DCR(r)		.BYTE _DCR_C + r
+#define NEG(r)		.BYTE _NEG_C + r
+#define INV(r)		.BYTE _INV_C + r
 #define TST(r)		.BYTE _TST_C + r
-#define DEC(r)		.BYTE _DEC_C + r
-#define HEX(r)		.BYTE _HEX_C + r
 #define ADD(r, p, q)	.BYTE _ADD_C + r, p * 16 + q
 #define SUB(r, p, q)	.BYTE _SUB_C + r, p * 16 + q
 #define MUL(r, p, q)	.BYTE _MUL_C + r, p * 16 + q
