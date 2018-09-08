@@ -116,7 +116,15 @@ _SET	.(		; SET r aabbcc.dd	1r dd cc bb aa	Rr <- aabbcc.dd	- set register
 _1	RTS		; done
 .)
 
-_PSH	.(		; PSH r			2r		RS <- Rr	- push onto stack
+_LDD	.(		; LDD r xxyy		2r yy xx	Rr <- (xxyy)	- load register directly from address
+	RTS
+.)
+
+_SVD	.(		; SVD r xxyy		3r yy xx	(xxyy) <- Rr	- save register directly to address
+	RTS
+.)
+
+_PSH	.(		; PSH r			4r		RS <- Rr	- push onto stack
 	LDY _RSI	; get register stack index
 	CPY #_RSS	; compare against limit
 	BCC _1		; still room, all okay
@@ -137,7 +145,7 @@ _1	LDA _R0,X	; transfer four bytes over
 	RTS
 .)
 
-_POP	.(		; POP r			3r		Rr <- RS	- pop from stack
+_POP	.(		; POP r			5r		Rr <- RS	- pop from stack
 	LDY _RSI	; get register stack index
 	BNE _1		; all good, something can be popped off the stack
 	BRK		; next pop will cause a stack underflow, abort and call exception handler (TODO)
@@ -157,7 +165,7 @@ _1	DEY		; transfer four bytes over
 	RTS
 .)
 
-_EXC	.(		; EXC r			4r		Rr <-> RS	- exchange Rr with stack
+_EXC	.(		; EXC r			6r		Rr <-> RS	- exchange Rr with stack
 	LDY _RSI	; RS to I0
 	LDA _RS-1,Y
 	STA _I0+3
@@ -186,23 +194,27 @@ _EXC	.(		; EXC r			4r		Rr <-> RS	- exchange Rr with stack
 	RTS
 .)
 
-_ADDI0X	.(		; add I0 to register indexed by X
+_ADPI0X	.(		; add value pointed by I0 to register indexed by X
 	LDA _R0+3,X
 	AND #_MSK_O	; check for existing overflow condition
 	BEQ _1
 	EOR #_MSK_O
 	BNE _2		; existing overflow, skip decrement operation
 _1	CLC		; adding RD
-	LDA _I0
+	LDY #0
+	LDA (_I0),Y
 	ADC _R0,X
 	STA _R0,X
-	LDA _I0+1
+	INY
+	LDA (_I0),Y
 	ADC _R0+1,X
 	STA _R0+1,X
-	LDA _I0+2
+	INY
+	LDA (_I0),Y
 	ADC _R0+2,X
 	STA _R0+2,X
-	LDA _I0+3
+	INY
+	LDA (_I0),Y
 	ADC _R0+3,X
 	STA _R0+3,X
 	AND #_MSK_O	; check for overflow
@@ -219,34 +231,20 @@ _3	LDA _F		; clear overflow
 _4	RTS
 .)
 
-_INR	.(		; INR r			5r		Rr <- Rr + 1.0	- increment register
-	LDA #0		; set I0 to plus one
+_INR	.(		; INR r			7r		Rr <- Rr + 1.0	- increment register
+	LDA #<PLS_1	; set I0 to reference plus one
 	STA _I0
-	LDA #_PLS_1
+	LDA #>PLS_1
 	STA _I0+1
-	LDA #0
-	STA _I0+2
-	STA _I0+3
-	BEQ _ADDI0X
+	BEQ _ADPI0X
 .)
 
-_DCR	.(		; DCR r			6r		Rr <- Rr - 1.0	- decrement register
-	LDA #0		; set I0 to minus one
+_DCR	.(		; DCR r			8r		Rr <- Rr - 1.0	- decrement register
+	LDA #<MNS_1	; set I0 to reference minus one
 	STA _I0
-	LDA #_MNS_1
+	LDA #>MNS_1
 	STA _I0+1
-	LDA #$FF
-	STA _I0+2
-	STA _I0+3
-	BNE _ADDI0X
-.)
-
-_NEG	.(		; NEG r			7r		Rr <- -Rr	- negate register
-	RTS
-.)
-
-_INV	.(		; INV r			8r		Rr <- 1.0 / Rr	- multiplicative inverse of register
-	RTS
+	BNE _ADPI0X
 .)
 
 _TST	.(		; TST r			9r		F <- Rr <=> 0.0	- test register
@@ -936,8 +934,12 @@ _END_CMN_CD
 
 FN_0X	.WORD _ESC-1, _RTN-1, _BRS-1, _BRA-1, _BRE-1, _BRG-1, _BRL-1, _BRZ-1,
 	.WORD _BRP-1, _BRN-1, _BRO-1, _BRU-1, _CPR-1, _LDI-1, _SVI-1, _CMR-1
-FN_XR	.WORD _SET-1, _POP-1, _PSH-1, _EXC-1, _INR-1, _DCR-1, _NEG-1,
-	.WORD _INV-1, _TST-1, _ADD-1, _SUB-1, _MUL-1, _DIV-1, _MOD-1
+FN_XR	.WORD _SET-1, _LDD-1, _SVD-1, _PSH-1, _POP-1, _EXC-1, _INR-1,
+	.WORD _DCR-1, _TST-1, _ADD-1, _SUB-1, _MUL-1, _DIV-1, _MOD-1
+
+	; numerical constants
+PLS_1	.BYTE $00, $04, $00, $00
+MNS_1	.BYTE $00, $fc, $ff, $ff
 
 _END_CMN_DT
 
