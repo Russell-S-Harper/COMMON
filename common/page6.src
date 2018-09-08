@@ -1,15 +1,14 @@
 #include "rom.h"
 #include "macros.h"
+#include "globals.h"
 
 	* = $600
 
 HDR(DEMO)
 	CMN
-	SET(R0, $b8 + 28)
-	SET(R2, -999999.999)
-	SET(R7, 1048575.999)
-	LDI(R1, R0)
-	SVI(R0, R2)
+	LDD(R0, PLS_1)
+	LDD(R1, MNS_1)
+	ADD(R2, R0, R1)
 	ESC
 	BRK
 

@@ -117,7 +117,31 @@ _1	RTS		; done
 .)
 
 _LDD	.(		; LDD r xxyy		2r yy xx	Rr <- (xxyy)	- load register directly from address
-	RTS
+	LDY #0		; set up address in I0
+	LDA (_PC),Y
+	STA _I0
+	INY
+	LDA (_PC),Y
+	STA _I0+1
+	DEY		; transfer four bytes over
+	LDA (_I0),Y
+	STA _R0,X
+	INY
+	LDA (_I0),Y
+	STA _R0+1,X
+	INY
+	LDA (_I0),Y
+	STA _R0+2,X
+	INY
+	LDA (_I0),Y
+	STA _R0+3,X
+	LDA #2		; update program counter
+	CLC
+	ADC _PCL
+	STA _PCL
+	BCC _1
+	INC _PCH
+_1	RTS		; done
 .)
 
 _SVD	.(		; SVD r xxyy		3r yy xx	(xxyy) <- Rr	- save register directly to address
