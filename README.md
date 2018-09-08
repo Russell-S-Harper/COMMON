@@ -43,4 +43,4 @@ To build and run:
     make all
     make run
 
-The makefiles use `re2c`, `flex`, `bison`, `gcc`, `cpp`, and `xa`. Will eventually provide a `./configure`.
+The makefiles use `re2c`, `flex`, `bison`, `gcc`, `cpp`, `xa`, `grep`, and `sed`. Will eventually provide a `./configure`.
