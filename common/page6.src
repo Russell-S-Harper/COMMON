@@ -8,7 +8,8 @@ HDR(DEMO)
 	CMN
 	LDD(R0, PLS_1)
 	LDD(R1, MNS_1)
-	ADD(R2, R0, R1)
+	SVD(R1, SVD_T)
+	LDD(R2, SVD_T)
 	ESC
 	BRK
 
@@ -27,3 +28,5 @@ _2	EXT(S0)
 END(FACTORIAL)
 
 END(DEMO)
+
+SVD_T	.BYTE 0, 0, 0, 0

@@ -145,7 +145,31 @@ _1	RTS		; done
 .)
 
 _SVD	.(		; SVD r xxyy		3r yy xx	(xxyy) <- Rr	- save register directly to address
-	RTS
+	LDY #0		; set up address in I0
+	LDA (_PC),Y
+	STA _I0
+	INY
+	LDA (_PC),Y
+	STA _I0+1
+	DEY		; transfer four bytes over
+	LDA _R0,X
+	STA (_I0),Y
+	INY
+	LDA _R0+1,X
+	STA (_I0),Y
+	INY
+	LDA _R0+2,X
+	STA (_I0),Y
+	INY
+	LDA _R0+3,X
+	STA (_I0),Y
+	LDA #2		; update program counter
+	CLC
+	ADC _PCL
+	STA _PCL
+	BCC _1
+	INC _PCH
+_1	RTS		; done
 .)
 
 _PSH	.(		; PSH r			4r		RS <- Rr	- push onto stack
