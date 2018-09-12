@@ -9,7 +9,7 @@
 ;  Largest value: $3fffffff or +1048575.999(5)
 ;       Plus one: $00000400
 ;           Zero: $00000000
-;      Minus one: $fffffc00		
+;      Minus one: $fffffc00
 ; Smallest value: $c0000000 or -1048576.000(0)
 
 ; Instructions

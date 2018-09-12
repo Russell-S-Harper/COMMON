@@ -43,7 +43,7 @@ _3	TAX		; save operand for later
 	ASL		; shift to get offset to register
 	ASL
 	TAX		; back to index
-	RTS		; "return" to routine	
+	RTS		; "return" to routine
 _4	TXA		; get operand
 	ASL		; shift to get offset to 0X instructions
 	TAY
@@ -52,7 +52,7 @@ _4	TXA		; get operand
 	LDA FN_0X,Y	; push low address
 	PHA
 	TXA		; restore operand
-	RTS		; "return" to routine	
+	RTS		; "return" to routine
 _5	TXA		; get operand
 	AND #$F		; mask to get index
 	ASL		; shift to get offset to FX instructions
@@ -248,9 +248,9 @@ _ADPI0X	.(		; add value pointed by I0 to register indexed by X
 	BEQ _1
 	EOR #_MSK_O
 	BNE _2		; existing overflow, skip decrement operation
-_1	CLC		; adding RD
-	LDY #0
+_1	LDY #0		; adding RD
 	LDA (_I0),Y
+	CLC
 	ADC _R0,X
 	STA _R0,X
 	INY
@@ -400,8 +400,8 @@ _ADD	.(		; ADD r pq		ar pq		Rr <- Rp + Rq	- addition
 	TXA
 	PHA		; save r register for later
 	JSR _GETPQF
-	CLC		; set I0 to Rp + Rq
-	LDA _R0,X
+	LDA _R0,X	; set I0 to Rp + Rq
+	CLC
 	ADC _R0,Y
 	STA _I0
 	LDA _R0+1,X
@@ -588,8 +588,8 @@ _3	LSR _I1+3	; get lowest bit of operand
 	ROR _I1+1
 	ROR _I1
 	BCC _4		; skip adding in product if bit is zero
-	CLC
 	LDA _I3		; add in p register
+	CLC
 	ADC _I0
 	STA _I3
 	LDA _I3+1
@@ -844,20 +844,38 @@ _BRS	.(		; BRS xxyy		02 yy xx	PC <- PC + xxyy	- branch to subroutine
 .)
 
 _BRA	.(		; BRA xxyy		03 yy xx	PC <- PC + xxyy	- branch always
+	LDY #1		; save the offset
+	LDA (_PC), Y
+	PHA
+	DEY
+	LDA (_PC), Y
+	PHA
+	LDA #2		; update PC by the length of the branch address
+	CLC
+	ADC _PCL
+	STA _PCL
+	BNE _1
+	INC _PCH
+_1	PLA		; pull the low byte
+	CLC
+	ADC _PCL
+	STA _PCL
+	PLA		; pull the high byte
+	ADC _PCH
+	STA _PCH
 	RTS
 .)
 
 _BRX	.(		; generic branch testing
 	AND _F		; check the bit
 	BNE _BRA	; if set, branch
-	CLC		; not set, advance the program counter over the xxyy offset
-	LDA #2
+	LDA #2		; not set, advance the program counter over the xxyy offset
+	CLC
 	ADC _PCL
 	STA _PCL
-	LDA #0
-	ADC _PCH
-	STA _PCH
-	RTS
+	BNE _1
+	INC _PCH
+_1	RTS
 .)
 
 _BRE	.(		; BRE xxyy		04 yy xx	PC <- PC + xxyy	- branch if Rp = Rq (after CMP)
