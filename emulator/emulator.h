@@ -13,7 +13,7 @@ void reset6502();
 /* Execute 6502 code up to the next specified count of clock ticks. */
 void exec6502(uint32_t tickcount);
 
-/* Execute a single instrution. */
+/* Execute a single instruction. */
 void step6502();
 
 /* Trigger a hardware IRQ in the 6502 core. */
