@@ -878,17 +878,17 @@ _BRX	.(		; generic branch testing
 _1	RTS
 .)
 
-_BRE	.(		; BRE xxyy		04 yy xx	PC <- PC + xxyy	- branch if Rp = Rq (after CMP)
+_BRE	.(		; BRE xxyy		04 yy xx	PC <- PC + xxyy	- branch if Rp = Rq (after CMR)
 	LDA #_F_E
 	BNE _BRX
 .)
 
-_BRG	.(		; BRG xxyy		05 yy xx	PC <- PC + xxyy	- branch if Rp > Rq (after CMP)
+_BRG	.(		; BRG xxyy		05 yy xx	PC <- PC + xxyy	- branch if Rp > Rq (after CMR)
 	LDA #_F_G
 	BNE _BRX
 .)
 
-_BRL	.(		; BRL xxyy		06 yy xx	PC <- PC + xxyy	- branch if Rp < Rq (after CMP)
+_BRL	.(		; BRL xxyy		06 yy xx	PC <- PC + xxyy	- branch if Rp < Rq (after CMR)
 	LDA #_F_L
 	BNE _BRX
 .)
