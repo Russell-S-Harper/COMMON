@@ -416,12 +416,9 @@ _ADD	.(		; ADD r pq		ar pq		Rr <- Rp + Rq	- addition
 	JMP _RETI0X	; pull X, transfer I0 to r register, let it handle the return
 .)
 
-_SUB	.(		; SUB r pq		br pq		Rr <- Rp - Rq	- subtraction
-	TXA
-	PHA		; save r register for later
-	JSR _GETPQF
-	SEC		; set I0 to Rp - Rq
-	LDA _R0,X
+_SBXYI0	.(		; set I0 to register pointed by X - register pointed by Y
+	LDA _R0,X	; set I0 to Rp - Rq
+	SEC
 	SBC _R0,Y
 	STA _I0
 	LDA _R0+1,X
@@ -433,12 +430,20 @@ _SUB	.(		; SUB r pq		br pq		Rr <- Rp - Rq	- subtraction
 	LDA _R0+3,X
 	SBC _R0+3,Y
 	STA _I0+3
+	RTS
+.)
+
+_SUB	.(		; SUB r pq		br pq		Rr <- Rp - Rq	- subtraction
+	TXA
+	PHA		; save r register for later
+	JSR _GETPQF
+	JSR _SBXYI0
 	JMP _RETI0X	; pull X, transfer I0 to r register, let it handle the return
 .)
 
 _NEGX	.(		; negates register at X
-	SEC
 	LDA #0
+	SEC
 	SBC _R0,X
 	STA _R0,X
 	LDA #0
@@ -704,8 +709,8 @@ _1	RTS
 .)
 
 _UPDDM	.(		; update DIV and MOD
-	SEC		; I0/I1 -= I2/I3
-	LDA _I0
+	LDA _I0		; I0/I1 -= I2/I3
+	SEC
 	SBC _I2
 	STA _I0
 	LDA _I0+1
@@ -987,6 +992,24 @@ _SVI	.(		; SVI pq		0e pq		(Rp:bbcc) <- Rq	- save indirect to memory
 .)
 
 _CMR	.(		; CMR pq		0f pq		F <- Rp <=> Rq	- compare registers
+	JSR _GETPQF
+	JSR _SBXYI0
+	LDA _F
+	AND #_MSK_C	; clear CMR bits
+	STA _F
+	LDA _I0+3	; check highest byte
+	BMI _1		; is less than
+	ORA _I0+2	; could be greater than or equal to, OR with all other bytes
+	ORA _I0+1
+	ORA _I0
+	BNE _2		; is greater than
+	LDA #_F_E	; set equal to flag
+	BNE _3
+_1	LDA #_F_L	; set less than flag
+	BNE _3
+_2	LDA #_F_G	; set greater than flag
+_3	ORA _F
+	STA _F
 	RTS
 .)
 

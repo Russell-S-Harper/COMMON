@@ -138,5 +138,6 @@ _EXT_C	= $f0
 _MSK_O	= %11000000			; mask for overflow
 _MSK_R	= %00111100			; mask for registers
 _MSK_T	= (_F_Z + _F_P + _F_N)^$ff	; mask for TST
+_MSK_C	= (_F_E + _F_G + _F_L)^$ff	; mask for CMP
 
 #endif /* __COMMON_H */
