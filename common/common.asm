@@ -371,7 +371,7 @@ _TRFI0X	.(		; transfer I0 to register indexed by X, MSB returned in A
 	RTS
 .)
 
-_RTZI0X	.(		; clears I0, clears underflow, falls through to _RETI0X
+_RTZI0X	.(		; clears I0, clears underflow, *falls thru* to _RETI0X
 	JSR _ZERI0
 	LDA _F		; clear underflow
 	AND #_F_U^$FF
@@ -841,46 +841,84 @@ _ESC	.(		; ESC			00				- escape back into regular assembler
 .)
 
 _RTN	.(		; RTN			01				- return from subroutine
+	; some stack hocus pocus
+	; currently the stack has return address corresponding to _CMN._1 + 2, _PCL, _PCH, ...
+	; we need to pop that, pop the updated PC, then push the address back
+	PLA		; save the return address
+	STA _I0+2
+	PLA
+	STA _I0+3
+	PLA		; pull the program counter to return
+	STA _PCH
+	PLA
+	STA _PCL
+	LDA _I0+3	; push the return address back
+	PHA
+	LDA _I0+2
+	PHA
 	RTS
 .)
 
-_BRS	.(		; BRS xxyy		02 yy xx	PC <- PC + xxyy	- branch to subroutine
-	RTS
-.)
-
-_BRA	.(		; BRA xxyy		03 yy xx	PC <- PC + xxyy	- branch always
+_INIBR	.(		; save the branch offset in I0, *falls thru* to _UPDPC
 	LDY #1		; save the offset
 	LDA (_PC), Y
-	PHA
+	STA _I0+1	; high byte
 	DEY
 	LDA (_PC), Y
-	PHA
-	LDA #2		; update PC by the length of the branch address
-	CLC
-	ADC _PCL
-	STA _PCL
-	BNE _1
-	INC _PCH
-_1	PLA		; pull the low byte
-	CLC
-	ADC _PCL
-	STA _PCL
-	PLA		; pull the high byte
-	ADC _PCH
-	STA _PCH
-	RTS
+	STA _I0		; low byte
 .)
 
-_BRX	.(		; generic branch testing
-	AND _F		; check the bit
-	BNE _BRA	; if set, branch
-	LDA #2		; not set, advance the program counter over the xxyy offset
+_UPDPC	.(		; update PC by the length of a branch address
+	LDA #2		; the length of a branch address
 	CLC
 	ADC _PCL
 	STA _PCL
 	BNE _1
 	INC _PCH
 _1	RTS
+.)
+
+_UPPCI0	.(		; update PC with offset in I0
+	LDA _I0		; get the low byte
+	CLC
+	ADC _PCL
+	STA _PCL
+	LDA _I0+1	; get the high byte
+	ADC _PCH
+	STA _PCH
+	RTS
+.)
+
+_BRS	.(		; BRS xxyy		02 yy xx	PC <- PC + xxyy	- branch to subroutine
+	; some stack hocus pocus
+	; currently the stack has return address corresponding to _CMN._1 + 2, ...
+	; we need to pop that, push the updated PC, then push the address back
+	JSR _INIBR	; save the offset and update PC by the length of a branch address
+	PLA
+	STA _I0+2
+	PLA
+	STA _I0+3
+	LDA _PCL	; push the program counter to return
+	PHA
+	LDA _PCH
+	PHA
+	LDA _I0+3	; push the return address back
+	PHA
+	LDA _I0+2
+	PHA
+	; stack is now _CMN._1 + 2, _PCL, _PCH, ...
+	JMP _UPPCI0	; update PC with I0 offset, let it handle the return
+.)
+
+_BRA	.(		; BRA xxyy		03 yy xx	PC <- PC + xxyy	- branch always
+	JSR _INIBR	; save the offset and update PC by the length of a branch address
+	JMP _UPPCI0	; update PC with I0 offset, let it handle the return
+.)
+
+_BRX	.(		; generic branch testing
+	AND _F		; check the bit
+	BNE _BRA	; if set, branch
+	JMP _UPDPC	; not set, advance the program counter over the xxyy offset, let it handle the return
 .)
 
 _BRE	.(		; BRE xxyy		04 yy xx	PC <- PC + xxyy	- branch if Rp = Rq (after CMR)
