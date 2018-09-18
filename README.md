@@ -19,7 +19,7 @@ Why 6502 and not, for example, x86?
 * interesting to see it run in newer faster versions of 6502 processors
 * how do you think Bender does what he does? (or the Terminator!)
 
-In progress:
+Completed:
 
 * added all the instructions (see `common/common.h` for the list)
 
