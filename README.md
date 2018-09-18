@@ -21,8 +21,12 @@ Why 6502 and not, for example, x86?
 
 In progress:
 
-* add all the instructions (see `common/common.h` for the list)
-* a simple unit test suite to ensure each instruction is correct
+* added all the instructions (see `common/common.h` for the list)
+
+In progress:
+
+* a unit test suite to ensure each instruction is correct
+* a proof-of-concept application
 
 The meat of the project:
 
