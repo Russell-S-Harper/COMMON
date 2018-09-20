@@ -97,6 +97,8 @@ _PS	= _IDY + 1			; saved processor status to restore
 _RS	= $200				; register stack
 _RSS	= (FN_FX - _RS)			; register stack size
 
+; for context switching, at least _R0 to FN_FX-1 plus one byte for the stack pointer need to be saved and restored
+
 ; last 32 bytes of page two
 FN_FX	= $2e0				; list of system and user functions
 
