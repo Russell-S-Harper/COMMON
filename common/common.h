@@ -47,7 +47,7 @@
 ; CMR pq		0f pq		F <- Rp <=> Rq	- compare registers
 
 ; 40 bytes in page zero for common registers
-_R0	= $b8
+_R0	= $100 - 4 * (10 + 9)
 _R1	= _R0 + 4
 _R2	= _R1 + 4
 _R3	= _R2 + 4
@@ -58,15 +58,16 @@ _R7	= _R6 + 4
 _R8	= _R7 + 4
 _R9	= _R8 + 4
 
-; 32 bytes in page zero for internal registers
-_I0	= $e0				; workspace
+; 36 bytes in page zero for internal registers
+_I0	= _R9 + 4			; workspace
 _I1	= _I0 + 4
 _I2	= _I1 + 4
 _I3	= _I2 + 4
 _I4	= _I3 + 4
 _I5	= _I4 + 4
 _I6	= _I5 + 4			; register I6 maintains common status
-_I7	= _I6 + 4			; register I7 saves/restores processor status
+_I7	= _I6 + 4			; register I7 maintains process information for context switching
+_I8	= _I7 + 4			; register I8 saves/restores processor status
 
 ; register I6 maintains common status
 ; (dd cc bb aa) aa: index for register stack RS / ccbb: program counter PC / dd: flags F UONPZLGE
@@ -86,21 +87,33 @@ _F_N	=  32				; if Rr < 0.0 (after TST)
 _F_O	=  64				; if overflow (after arithmetic operations)
 _F_U	= 128				; if underflow (after arithmetic operations)
 
-; register I7 saves/restores processor status
+; register I7 maintains process information for context switching
+_PST	= _I7				; current process status
+_PSI	= _PST + 1			; process stack index to save/restore
+_PD0	= _PSI + 1			; two bytes for process
+_PD1	= _PD0 + 1
+
+; register I8 saves/restores processor status
 ; (dd cc bb aa) aa: accumulator, bb: index X, cc: index Y, dd: processor status
-_ACC	= _I7				; saved accumulator to restore
+_ACC	= _I8				; saved accumulator to restore
 _IDX	= _ACC + 1			; saved index X to restore
 _IDY	= _IDX + 1			; saved index Y to restore
 _PS	= _IDY + 1			; saved processor status to restore
 
-; 224 bytes of page two
+; 6502 stack resides on page one
+
+; using some of page two for register stack
 _RS	= $200				; register stack
-_RSS	= (FN_FX - _RS)			; register stack size
+_RSS	= _R0				; register stack size
 
-; for context switching, at least _R0 to FN_FX-1 plus one byte for the stack pointer need to be saved and restored
+; for context switching, _R0 to _RS + _RSS - 1 needs to be saved and restored
+; this should comprise two pages or 512 bytes
 
-; last 32 bytes of page two
-FN_FX	= $2e0				; list of system and user functions
+_PR	= _RS + _RSS			; running processes
+_PRS	= FN_FX - _PR			; running process size
+
+; 32 bytes of page two
+FN_FX	= $300 - 2 * 16			; list of system and user functions
 
 ; function constants
 _ESC_C	= $00
