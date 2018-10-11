@@ -26,6 +26,7 @@ Completed:
 In progress:
 
 * a unit test suite to ensure each instruction is correct
+* context switching for simple multitasking
 * a proof-of-concept application
 
 The meat of the project:
