@@ -3,11 +3,11 @@
 #include "emulator.h"
 
 /* Register I6 maintains common status */
-#define _R0	0xb4
-#define _R8	0xd4
-#define _I0	0xdc
-#define _I6	0xf4
-#define _I8	0xfc
+#define _R0	0xb0
+#define _R8	0xd0
+#define _I0	0xd8
+#define _I6	0xf0
+#define _I8	0xf8
 
 /* (dd cc bb aa) aa: index for register stack RS / ccbb: program counter PC / dd: flags F UONPZLGE */
 #define _RSI	_I6		/* register stack index */

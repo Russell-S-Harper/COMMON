@@ -47,7 +47,7 @@
 ; CMR pq		0f pq		F <- Rp <=> Rq	- compare registers
 
 ; 40 bytes in page zero for common registers
-_R0	= $100 - 4 * (10 + 9)
+_R0	= $100 - 4 * (10 + 10)
 _R1	= _R0 + 4
 _R2	= _R1 + 4
 _R3	= _R2 + 4
@@ -58,7 +58,7 @@ _R7	= _R6 + 4
 _R8	= _R7 + 4
 _R9	= _R8 + 4
 
-; 36 bytes in page zero for internal registers
+; 40 bytes in page zero for internal registers
 _I0	= _R9 + 4			; workspace
 _I1	= _I0 + 4
 _I2	= _I1 + 4
@@ -66,8 +66,9 @@ _I3	= _I2 + 4
 _I4	= _I3 + 4
 _I5	= _I4 + 4
 _I6	= _I5 + 4			; register I6 maintains common status
-_I7	= _I6 + 4			; register I7 maintains process information for context switching
-_I8	= _I7 + 4			; register I8 saves/restores processor status
+_I7	= _I6 + 4			; register I7 maintains locations of process and allocated memory
+_I8	= _I7 + 4			; register I8 maintains process information for context switching
+_I9	= _I8 + 4			; register I9 saves/restores processor status
 
 ; register I6 maintains common status
 ; (dd cc bb aa) aa: index for register stack RS / ccbb: program counter PC / dd: flags F UONPZLGE
@@ -87,15 +88,17 @@ _F_N	=  32				; if Rr < 0.0 (after TST)
 _F_O	=  64				; if overflow (after arithmetic operations)
 _F_U	= 128				; if underflow (after arithmetic operations)
 
-; register I7 maintains process information for context switching
-_PST	= _I7				; current process status
+; register I7 maintains locations of process and allocated memory
+
+; register I8 maintains process information for context switching
+_PST	= _I8				; current process status
 _PSI	= _PST + 1			; process stack index to save/restore
-_PD0	= _PSI + 1			; two bytes for process
+_PD0	= _PSI + 1			; pending
 _PD1	= _PD0 + 1
 
-; register I8 saves/restores processor status
+; register I9 saves/restores processor status
 ; (dd cc bb aa) aa: accumulator, bb: index X, cc: index Y, dd: processor status
-_ACC	= _I8				; saved accumulator to restore
+_ACC	= _I9				; saved accumulator to restore
 _IDX	= _ACC + 1			; saved index X to restore
 _IDY	= _IDX + 1			; saved index Y to restore
 _PS	= _IDY + 1			; saved processor status to restore
@@ -152,7 +155,7 @@ _EXT_C	= $f0
 ; common constants
 _MSK_O	= %11000000			; mask for overflow
 _MSK_R	= %00111100			; mask for registers
-_MSK_T	= (_F_Z + _F_P + _F_N)^$ff	; mask for TST
-_MSK_C	= (_F_E + _F_G + _F_L)^$ff	; mask for CMP
+_MSK_T	= (_F_Z + _F_P + _F_N) ^ $ff	; mask for TST
+_MSK_C	= (_F_E + _F_G + _F_L) ^ $ff	; mask for CMP
 
 #endif /* __COMMON_H */
