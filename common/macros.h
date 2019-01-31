@@ -39,23 +39,28 @@
 #define	U8		7
 #define	U9		6
 
+; shorthand
+#define	_OFF_M(o)	((o) - * - 3)
+#define _BRX_M(o)	<_OFF_M(o), >_OFF_M(o)
+#define	_MRG_M(p, q)	(p) * 16 + (q)
+
 ; macros
 #define ESC		.BYTE _ESC_C
 #define RTN		.BYTE _RTN_C
-#define BRS(o)		.BYTE _BRS_C, <((o) - * - 3), >((o) - * - 3)
-#define BRA(o)		.BYTE _BRA_C, <((o) - * - 3), >((o) - * - 3)
-#define BRE(o)		.BYTE _BRE_C, <((o) - * - 3), >((o) - * - 3)
-#define BRG(o)		.BYTE _BRG_C, <((o) - * - 3), >((o) - * - 3)
-#define BRL(o)		.BYTE _BRL_C, <((o) - * - 3), >((o) - * - 3)
-#define BRZ(o)		.BYTE _BRZ_C, <((o) - * - 3), >((o) - * - 3)
-#define BRP(o)		.BYTE _BRP_C, <((o) - * - 3), >((o) - * - 3)
-#define BRN(o)		.BYTE _BRN_C, <((o) - * - 3), >((o) - * - 3)
-#define BRO(o)		.BYTE _BRO_C, <((o) - * - 3), >((o) - * - 3)
-#define BRU(o)		.BYTE _BRU_C, <((o) - * - 3), >((o) - * - 3)
-#define CPR(p, q)	.BYTE _CPR_C, (p) * 16 + (q)
-#define LDI(p, q)	.BYTE _LDI_C, (p) * 16 + (q)
-#define SVI(p, q)	.BYTE _SVI_C, (p) * 16 + (q)
-#define CMR(p, q)	.BYTE _CMR_C, (p) * 16 + (q)
+#define BRS(o)		.BYTE _BRS_C, _BRX_M(o)
+#define BRA(o)		.BYTE _BRA_C, _BRX_M(o)
+#define BRE(o)		.BYTE _BRE_C, _BRX_M(o)
+#define BRG(o)		.BYTE _BRG_C, _BRX_M(o)
+#define BRL(o)		.BYTE _BRL_C, _BRX_M(o)
+#define BRZ(o)		.BYTE _BRZ_C, _BRX_M(o)
+#define BRP(o)		.BYTE _BRP_C, _BRX_M(o)
+#define BRN(o)		.BYTE _BRN_C, _BRX_M(o)
+#define BRO(o)		.BYTE _BRO_C, _BRX_M(o)
+#define BRU(o)		.BYTE _BRU_C, _BRX_M(o)
+#define CPR(p, q)	.BYTE _CPR_C, _MRG_M(p, q)
+#define LDI(p, q)	.BYTE _LDI_C, _MRG_M(p, q)
+#define SVI(p, q)	.BYTE _SVI_C, _MRG_M(p, q)
+#define CMR(p, q)	.BYTE _CMR_C, _MRG_M(p, q)
 #define SET(r, v)	.BYTE _SET_C + (r), _SET_V(#v)
 #define LDD(r, a)	.BYTE _LDD_C + (r), <(a), >(a)
 #define SVD(r, a)	.BYTE _SVD_C + (r), <(a), >(a)
@@ -65,11 +70,11 @@
 #define INR(r)		.BYTE _INR_C + (r)
 #define DCR(r)		.BYTE _DCR_C + (r)
 #define TST(r)		.BYTE _TST_C + (r)
-#define ADD(r, p, q)	.BYTE _ADD_C + (r), (p) * 16 + (q)
-#define SUB(r, p, q)	.BYTE _SUB_C + (r), (p) * 16 + (q)
-#define MUL(r, p, q)	.BYTE _MUL_C + (r), (p) * 16 + (q)
-#define DIV(r, p, q)	.BYTE _DIV_C + (r), (p) * 16 + (q)
-#define MOD(r, p, q)	.BYTE _MOD_C + (r), (p) * 16 + (q)
+#define ADD(r, p, q)	.BYTE _ADD_C + (r), _MRG_M(p, q)
+#define SUB(r, p, q)	.BYTE _SUB_C + (r), _MRG_M(p, q)
+#define MUL(r, p, q)	.BYTE _MUL_C + (r), _MRG_M(p, q)
+#define DIV(r, p, q)	.BYTE _DIV_C + (r), _MRG_M(p, q)
+#define MOD(r, p, q)	.BYTE _MOD_C + (r), _MRG_M(p, q)
 #define EXT(f)		.BYTE _EXT_C + (f)
 
 ; header, begin and end of blocks
