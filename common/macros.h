@@ -41,7 +41,7 @@
 
 ; shorthand
 #define	_OFF_M(o)	((o) - * - 3)
-#define _BRX_M(o)	<_OFF_M(o), >_OFF_M(o)
+#define	_BRX_M(o)	<_OFF_M(o), >_OFF_M(o)
 #define	_MRG_M(p, q)	(p) * 16 + (q)
 
 ; macros
