@@ -88,13 +88,19 @@ _F_N	=  32				; if Rr < 0.0 (after TST)
 _F_O	=  64				; if overflow (after arithmetic operations)
 _F_U	= 128				; if underflow (after arithmetic operations)
 
-; register I7 maintains locations of process and allocated memory
+; register I7 maintains locations of code and allocated real memory addresses
+_CRL	= _I7				; code low and high bytes
+_CRH	= _CRL + 1
+_ARL	= _CRH + 1			; allocated low and high bytes
+_ARH	= _ARL + 1
+_CR	= _CRL				; code real memory address
+_AR	= _ARL				; allocated real memory address
 
 ; register I8 maintains process information for context switching
 _PST	= _I8				; current process status
 _PSI	= _PST + 1			; process stack index to save/restore
-_PD0	= _PSI + 1			; pending
-_PD1	= _PD0 + 1
+_PSO	= _PSI + 1			; offset to running processes table
+_PSF	= _PSO + 1			; initial running process status PPPCCCLF
 
 ; register I9 saves/restores processor status
 ; (dd cc bb aa) aa: accumulator, bb: index X, cc: index Y, dd: processor status
@@ -112,10 +118,22 @@ _RSS	= _R0				; register stack size
 ; for context switching, _R0 to _RS + _RSS - 1 needs to be saved and restored
 ; this should comprise two pages or 512 bytes
 
-_PR	= _RS + _RSS			; running processes
-_PRS	= FN_FX - _PR			; running process size
+; the following are common process table and system & user functions
 
-; 32 bytes of page two
+; process information in the middle of page two
+_RP	= _RS + _RSS			; running processes table
+_RPS	= FN_FX - _RP			; running process table size
+
+; process information indices
+_RPV_I	= 0				; 4 bytes virtual memory address
+_RPR_I	= _RPV_I + 4			; 2 bytes real memory address
+_RPS_I	= _RPR_I + 2			; 1 byte size of program (in pages) including allocated memory
+_RPF_I	= _RPS_I + 1			; 1 byte status PPPCCCLF / P priority / C counter / L loaded / F finished
+
+_RPE	= _RPF_I + 1			; size of running process entry
+_RPL	= _RPS / _RPE			; number of running processes limit
+
+; last 32 bytes of page two
 FN_FX	= $300 - 2 * 16			; list of system and user functions
 
 ; function constants
