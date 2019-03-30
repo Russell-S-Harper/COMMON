@@ -42,8 +42,8 @@
 ; BRO xxyy		0a yy xx	PC <- PC + xxyy	- branch if overflow (after arithmetic operations)
 ; BRU xxyy		0b yy xx	PC <- PC + xxyy	- branch if underflow (after arithmetic operations)
 ; CPR pq		0c pq		Rp <- Rq	- copy register
-; LDI pq		0d pq		Rp <- (int(Rq))	- load indirect from memory
-; SVI pq		0e pq		(int(Rp)) <- Rq	- save indirect to memory
+; LDI pq		0d pq		Rp <- (int(Rq))	- load indirect via allocated memory offset
+; SVI pq		0e pq		(int(Rp)) <- Rq	- save indirect via allocated memory offset
 ; CMR pq		0f pq		F <- Rp <=> Rq	- compare registers
 
 ; 40 bytes in page zero for common registers
@@ -97,10 +97,10 @@ _CR	= _CRL				; code real memory address
 _AR	= _ARL				; allocated real memory address
 
 ; register I8 maintains process information for context switching
-_PST	= _I8				; current process status
-_PSI	= _PST + 1			; process stack index to save/restore
-_PSO	= _PSI + 1			; offset to running processes table
+_PSO	= _I8				; offset to running processes table
 _PSF	= _PSO + 1			; initial running process status PPPCCCLF
+_PST	= _PSF + 1			; current process status
+_PSI	= _PST + 1			; process stack index to save/restore
 
 ; register I9 saves/restores processor status
 ; (dd cc bb aa) aa: accumulator, bb: index X, cc: index Y, dd: processor status
@@ -127,8 +127,8 @@ _RPS	= FN_FX - _RP			; running process table size
 ; process information indices
 _RPV_I	= 0				; 4 bytes virtual memory address
 _RPR_I	= _RPV_I + 4			; 2 bytes real memory address
-_RPS_I	= _RPR_I + 2			; 1 byte size of program (in pages) including allocated memory
-_RPF_I	= _RPS_I + 1			; 1 byte status PPPCCCLF / P priority / C counter / L loaded / F finished
+_RPS_I	= _RPR_I + 2			; 1 byte size in pages: code + allocated memory + context switching
+_RPF_I	= _RPS_I + 1			; 1 byte status PPPCCCLF: P priority / C counter / L loaded / F finished
 
 _RPE	= _RPF_I + 1			; size of running process entry
 _RPL	= _RPS / _RPE			; number of running processes limit
