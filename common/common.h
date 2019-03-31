@@ -46,6 +46,9 @@
 ; SVI pq		0e pq		(int(Rp)) <- Rq	- save indirect via allocated memory offset
 ; CMR pq		0f pq		F <- Rp <=> Rq	- compare registers
 
+; 32 bytes in page zero for memory map allocation
+_MAP	= _R0 - 256 / 8
+
 ; 40 bytes in page zero for common registers
 _R0	= $100 - 4 * (10 + 10)
 _R1	= _R0 + 4
@@ -129,6 +132,10 @@ _RPV_I	= 0				; 4 bytes virtual memory address
 _RPR_I	= _RPV_I + 4			; 2 bytes real memory address
 _RPS_I	= _RPR_I + 2			; 1 byte size in pages: code + allocated memory + context switching
 _RPF_I	= _RPS_I + 1			; 1 byte status PPPCCCLF: P priority / C counter / L loaded / F finished
+
+; bits for status
+_S_L	=   1				; if program is loaded in memory
+_S_F	=   2				; if program is finished
 
 _RPE	= _RPF_I + 1			; size of running process entry
 _RPL	= _RPS / _RPE			; number of running processes limit
