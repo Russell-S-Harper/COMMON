@@ -2,6 +2,7 @@
 #include "common.h"
 
 	; ROM code header
+	.BYTE CODE
 	.WORD CMN_CD, _END_CMN_CD - CMN_CD
 
 	; beginning of ROM code
@@ -976,14 +977,13 @@ _CPR	.(		; CPR pq		0c pq		Rp <- Rq	- copy register
 
 _INILS	.(		; common initialization for LDI and SVI
 	JSR _CPYI1	; copy q to I1
-	CLC		; shift to get an address
-	ROR _I1+3
-	ROR _I1+2
-	ROR _I1+1
-	CLC
-	ROR _I1+3
-	ROR _I1+2
-	ROR _I1+1
+	CLC		; add the allocated memory offset
+	LDA _ARL
+	ADC _I1+1
+	STA _I1+1
+	LDA _ARH
+	ADC _I1+2
+	STA _I1+2
 	RTS
 .)
 
@@ -1054,6 +1054,7 @@ _3	ORA _F
 _END_CMN_CD
 
 	; ROM data header
+	.BYTE DATA
 	.WORD CMN_DT, _END_CMN_DT - CMN_DT
 
 	; beginning of ROM data
@@ -1071,6 +1072,7 @@ MNS_1	.BYTE $00, $fc, $ff, $ff
 _END_CMN_DT
 
 	; 6502 addresses
+	.BYTE DATA
 	.WORD ADDR, 6
 
 	; 6502 NMI, Reset and IRQ

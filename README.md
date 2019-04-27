@@ -25,9 +25,9 @@ Completed:
 
 In progress:
 
-* context switching for simple multitasking
 * a unit test suite to ensure each instruction is correct
 * a proof-of-concept application
+* “simple” multitasking?
 
 The meat of the project:
 

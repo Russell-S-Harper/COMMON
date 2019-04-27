@@ -42,12 +42,9 @@
 ; BRO xxyy		0a yy xx	PC <- PC + xxyy	- branch if overflow (after arithmetic operations)
 ; BRU xxyy		0b yy xx	PC <- PC + xxyy	- branch if underflow (after arithmetic operations)
 ; CPR pq		0c pq		Rp <- Rq	- copy register
-; LDI pq		0d pq		Rp <- (int(Rq))	- load indirect via allocated memory offset
-; SVI pq		0e pq		(int(Rp)) <- Rq	- save indirect via allocated memory offset
+; LDI pq		0d pq		Rp <- (int(Rq))	- load indirect via index to allocated memory (offset = index * 4)
+; SVI pq		0e pq		(int(Rp)) <- Rq	- save indirect via index to allocated memory (offset = index * 4)
 ; CMR pq		0f pq		F <- Rp <=> Rq	- compare registers
-
-; 32 bytes in page zero for memory map allocation
-_MAP	= _R0 - 256 / 8
 
 ; 40 bytes in page zero for common registers
 _R0	= $100 - 4 * (10 + 10)
@@ -69,8 +66,8 @@ _I3	= _I2 + 4
 _I4	= _I3 + 4
 _I5	= _I4 + 4
 _I6	= _I5 + 4			; register I6 maintains common status
-_I7	= _I6 + 4			; register I7 maintains locations of process and allocated memory
-_I8	= _I7 + 4			; register I8 maintains process information for context switching
+_I7	= _I6 + 4			; register I7 maintains locations of code and allocated memory
+_I8	= _I7 + 4			; register I8 is reserved for future use, e.g. context switching
 _I9	= _I8 + 4			; register I9 saves/restores processor status
 
 ; register I6 maintains common status
@@ -91,19 +88,15 @@ _F_N	=  32				; if Rr < 0.0 (after TST)
 _F_O	=  64				; if overflow (after arithmetic operations)
 _F_U	= 128				; if underflow (after arithmetic operations)
 
-; register I7 maintains locations of code and allocated real memory addresses
+; register I7 maintains locations of code and allocated memory
 _CRL	= _I7				; code low and high bytes
 _CRH	= _CRL + 1
 _ARL	= _CRH + 1			; allocated low and high bytes
 _ARH	= _ARL + 1
-_CR	= _CRL				; code real memory address
-_AR	= _ARL				; allocated real memory address
+_CR	= _CRL				; code memory address
+_AR	= _ARL				; allocated memory address
 
-; register I8 maintains process information for context switching
-_PSO	= _I8				; offset to running processes table
-_PSF	= _PSO + 1			; initial running process status PPPCCCLF
-_PST	= _PSF + 1			; current process status
-_PSI	= _PST + 1			; process stack index to save/restore
+; register I8 is reserved for future use, e.g. context switching
 
 ; register I9 saves/restores processor status
 ; (dd cc bb aa) aa: accumulator, bb: index X, cc: index Y, dd: processor status
@@ -116,31 +109,11 @@ _PS	= _IDY + 1			; saved processor status to restore
 
 ; using some of page two for register stack
 _RS	= $200				; register stack
-_RSS	= _R0				; register stack size
+_RSS	= FN_FX - _RS			; register stack size
 
-; for context switching, _R0 to _RS + _RSS - 1 needs to be saved and restored
-; this should comprise two pages or 512 bytes
+; system & user functions
 
-; the following are common process table and system & user functions
-
-; process information in the middle of page two
-_RP	= _RS + _RSS			; running processes table
-_RPS	= FN_FX - _RP			; running process table size
-
-; process information indices
-_RPV_I	= 0				; 4 bytes virtual memory address
-_RPR_I	= _RPV_I + 4			; 2 bytes real memory address
-_RPS_I	= _RPR_I + 2			; 1 byte size in pages: code + allocated memory + context switching
-_RPF_I	= _RPS_I + 1			; 1 byte status PPPCCCLF: P priority / C counter / L loaded / F finished
-
-; bits for status
-_S_L	=   1				; if program is loaded in memory
-_S_F	=   2				; if program is finished
-
-_RPE	= _RPF_I + 1			; size of running process entry
-_RPL	= _RPS / _RPE			; number of running processes limit
-
-; last 32 bytes of page two
+; 32 bytes at the end of page two
 FN_FX	= $300 - 2 * 16			; list of system and user functions
 
 ; function constants
@@ -182,5 +155,9 @@ _MSK_O	= %11000000			; mask for overflow
 _MSK_R	= %00111100			; mask for registers
 _MSK_T	= (_F_Z + _F_P + _F_N) ^ $ff	; mask for TST
 _MSK_C	= (_F_E + _F_G + _F_L) ^ $ff	; mask for CMP
+
+; section identifiers
+CODE	= %10101010			; to indicate CODE section
+DATA	= %01010101			; to indicate DATA section
 
 #endif /* __COMMON_H */

@@ -78,7 +78,7 @@
 #define EXT(f)		.BYTE _EXT_C + (f)
 
 ; header, begin and end of blocks
-#define HDR(a)		.WORD a, _END_##a - a:* = * - 4:a .(
+#define HDR(t, a)	.BYTE t:.WORD a, _END_##a - a:* = * - 5:a .(
 #define BGN(a)		a .(
 #define END(a)		.):_END_##a
 
