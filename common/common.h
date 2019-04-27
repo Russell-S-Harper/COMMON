@@ -42,8 +42,8 @@
 ; BRO xxyy		0a yy xx	PC <- PC + xxyy	- branch if overflow (after arithmetic operations)
 ; BRU xxyy		0b yy xx	PC <- PC + xxyy	- branch if underflow (after arithmetic operations)
 ; CPR pq		0c pq		Rp <- Rq	- copy register
-; LDI pq		0d pq		Rp <- (int(Rq))	- load indirect via allocated memory offset
-; SVI pq		0e pq		(int(Rp)) <- Rq	- save indirect via allocated memory offset
+; LDI pq		0d pq		Rp <- (int(Rq))	- load indirect via index to allocated memory (offset = index * 4)
+; SVI pq		0e pq		(int(Rp)) <- Rq	- save indirect via index to allocated memory (offset = index * 4)
 ; CMR pq		0f pq		F <- Rp <=> Rq	- compare registers
 
 ; 40 bytes in page zero for common registers
