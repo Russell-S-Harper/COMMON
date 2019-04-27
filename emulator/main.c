@@ -7,6 +7,7 @@
 #define _R8	0xd0
 #define _I0	0xd8
 #define _I6	0xf0
+#define _I7	0xf4
 #define _I8	0xf8
 
 /* (dd cc bb aa) aa: index for register stack RS / ccbb: program counter PC / dd: flags F UONPZLGE */
@@ -15,6 +16,17 @@
 #define _PCH	_PCL + 1	/* program counter high */
 #define _F	_PCH + 1	/* flags */
 #define _PC	_PCL		/* program counter */
+
+/* register I7 maintains locations of code and allocated memory */
+#define _CRL	_I7				/* code low and high bytes */
+#define _CRH	_CRL + 1
+#define _ARL	_CRH + 1			/* allocated low and high bytes */
+#define _ARH	_ARL + 1
+#define _CR	_CRL				/* code memory address */
+#define _AR	_ARL				/* allocated memory address */
+
+#define CODE	0xaa				/* to indicate CODE section */
+#define DATA	0x55				/* to indicate DATA section */
 
 uint8_t memory[65536];
 
@@ -48,21 +60,33 @@ void hook() {
 
 int main() {
 
-	uint8_t header[4];
+	uint8_t header[5];
 
 	while (fread(header, sizeof(header), 1, stdin))
 	{
-		uint16_t index = header[0] + (header[1] << 8);
-		uint16_t length = header[2] + (header[3] << 8);
+		uint8_t type = header[0];
+		uint16_t index = header[1] + (header[2] << 8);
+		uint16_t length = header[3] + (header[4] << 8);
 
-		printf("\n%04x %u\n", index, length);
+		printf("\n%x %04x %u\n", type, index, length);
 
 		if (fread(memory + index, length, 1, stdin))
 		{
-			memory[_PCL] = 	header[0];
-			memory[_PCH] = 	header[1];
+			switch (type) {
+				case CODE:
+					memory[_CRL] = 	header[1];
+					memory[_CRH] = 	header[2];
+					break;
+				case DATA:
+					memory[_ARL] = 	header[1];
+					memory[_ARH] = 	header[2];
+					break;
+			}
 		}
 	}
+
+	memory[_PCL] = 	memory[_CRL];
+	memory[_PCH] = 	memory[_CRH];
 
 	hookexternal(hook);
 
