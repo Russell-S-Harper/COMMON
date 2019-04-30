@@ -2,7 +2,7 @@
 #include "common.h"
 
 	; ROM code header
-	.BYTE CODE
+	.BYTE _SM_FXD
 	.WORD CMN_CD, _END_CMN_CD - CMN_CD
 
 	; beginning of ROM code
@@ -1054,7 +1054,7 @@ _3	ORA _F
 _END_CMN_CD
 
 	; ROM data header
-	.BYTE DATA
+	.BYTE _SM_FXD
 	.WORD CMN_DT, _END_CMN_DT - CMN_DT
 
 	; beginning of ROM data
@@ -1072,7 +1072,7 @@ MNS_1	.BYTE $00, $fc, $ff, $ff
 _END_CMN_DT
 
 	; 6502 addresses
-	.BYTE DATA
+	.BYTE _SM_FXD
 	.WORD ADDR, 6
 
 	; 6502 NMI, Reset and IRQ

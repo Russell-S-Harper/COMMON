@@ -156,8 +156,14 @@ _MSK_R	= %00111100			; mask for registers
 _MSK_T	= (_F_Z + _F_P + _F_N) ^ $ff	; mask for TST
 _MSK_C	= (_F_E + _F_G + _F_L) ^ $ff	; mask for CMP
 
+; section modifiers
+_SM_FXD	= %00000001
+_SM_RLC	= %00000010
+_SM_CD	= %00000100
+_SM_DT	= %00001000
+
 ; section identifiers
-CODE	= %10101010			; to indicate CODE section
-DATA	= %01010101			; to indicate DATA section
+_RLC_CD	= _SM_RLC + _SM_CD		; relocatable code
+_RLC_DT	= _SM_RLC + _SM_DT		; relocatable data
 
 #endif /* __COMMON_H */

@@ -25,8 +25,15 @@
 #define _CR	_CRL				/* code memory address */
 #define _AR	_ARL				/* allocated memory address */
 
-#define CODE	0xaa				/* to indicate CODE section */
-#define DATA	0x55				/* to indicate DATA section */
+/* section modifiers */
+#define _SM_FXD	0x01
+#define _SM_RLC	0x02
+#define _SM_CD	0x04
+#define _SM_DT	0x08
+
+/* section identifiers */
+#define _RLC_CD	_SM_RLC + _SM_CD		/* relocatable code */
+#define _RLC_DT	_SM_RLC + _SM_DT		/* relocatable data */
 
 uint8_t memory[65536];
 
@@ -61,27 +68,46 @@ void hook() {
 int main() {
 
 	uint8_t header[5];
+	/* where to start relocatables */
+	uint16_t index = 0x0600;
 
 	while (fread(header, sizeof(header), 1, stdin))
 	{
 		uint8_t type = header[0];
-		uint16_t index = header[1] + (header[2] << 8);
+		uint16_t entity = header[1] + (header[2] << 8);
 		uint16_t length = header[3] + (header[4] << 8);
 
-		printf("\n%x %04x %u\n", type, index, length);
+		printf("\n%x %04x %u\n", type, entity, length);
 
-		if (fread(memory + index, length, 1, stdin))
-		{
-			switch (type) {
-				case CODE:
-					memory[_CRL] = 	header[1];
-					memory[_CRH] = 	header[2];
-					break;
-				case DATA:
-					memory[_ARL] = 	header[1];
-					memory[_ARH] = 	header[2];
-					break;
-			}
+		switch (type) {
+			case _SM_FXD: /* fixed code or data */
+				/* entity is the address, length is the length of the code or data */
+				fread(memory + entity, length, 1, stdin);
+				break;
+
+			case _RLC_CD: /* relocatable code */
+				/* entity is the starting offset, length is the length of code */
+				if (fread(memory + index, length, 1, stdin)) {
+					/* offset the starting address */
+					entity += index;
+					/* save the starting address */
+					memory[_CRL] = entity & 0xff;
+					memory[_CRH] = entity >> 8;
+					/* advance to the end of the section */
+					index += length;
+				}
+				break;
+
+			case _RLC_DT: /* relocatable data */
+				/* entity is the length of zeroed data, length is the length of preset data */
+				if (fread(memory + index, length, 1, stdin)) {
+					/* save the start of the data */
+					memory[_ARL] = index & 0xff;
+					memory[_ARH] = index >> 8;
+					/* advance to the end of the section */
+					index += entity + length;
+				}
+				break;
 		}
 	}
 

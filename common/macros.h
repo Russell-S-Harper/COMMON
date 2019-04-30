@@ -77,9 +77,23 @@
 #define MOD(r, p, q)	.BYTE _MOD_C + (r), _MRG_M(p, q)
 #define EXT(f)		.BYTE _EXT_C + (f)
 
-; header, begin and end of blocks
-#define HDR(t, a)	.BYTE t:.WORD a, _END_##a - a:* = * - 5:a .(
-#define BGN(a)		a .(
-#define END(a)		.):_END_##a
+; header for fixed code or data
+#define HARD(l)		.BYTE _SM_FXD:.WORD l, _END_##l - l:* = * - 5:l .(
+
+; header for relocatable code: l(abel), s(tart) => starting offset, length of code
+#define CODE(l, s)	.BYTE _RLC_CD:.WORD s - l, _END_##l - l: * = * -5:l .(
+
+; header for relocatable data: l(abel), s(tart) of zeroed data, => length of zeroed data, length of preset data
+#define DATA(l, s)	.BYTE _RLC_DT:.WORD _END_##l - s, s - l: * = * - 5:l .(
+
+; initialize memory
+#define INIT(v)		.BYTE _SET_V(#v)
+
+; reserve c(ount)
+#define ZERO(c)		.DSB c * 4, 0	
+
+; common begin and end
+#define BGN(l)		l .(
+#define END(l)		.):_END_##l
 
 #endif /* __MACROS_H */

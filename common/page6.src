@@ -2,17 +2,18 @@
 #include "macros.h"
 #include "globals.h"
 
-	* = $600
+	* = 0
 
-HDR(CODE, DEMO)
+CODE(DEMO, DEMO)
 	CMN
 	SET(R0, 9.4662)
 	SET(R1, 0)
+	LDI(R7, R1)
 	SVI(R1, R0)
 	PSH(R0)
 	BRS(FACTORIAL)
 	POP(R4)
-	SET(R5, 0)
+	SET(R5, 1)
 	LDI(R6, R5)
 	ESC
 	BRK
@@ -33,9 +34,7 @@ END(FACTORIAL)
 
 END(DEMO)
 
-HDR(DATA, WORKING)
-
-ONE	.BYTE 0, 0, 0, 0
-TWO	.BYTE 0, 0, 0, 0
-
+DATA(WORKING, EXTRA)
++PI	INIT(3.1415926535)
++EXTRA	ZERO(2)
 END(WORKING)
