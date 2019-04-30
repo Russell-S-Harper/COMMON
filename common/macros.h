@@ -78,22 +78,24 @@
 #define EXT(f)		.BYTE _EXT_C + (f)
 
 ; header for fixed code or data
-#define HARD(l)		.BYTE _SM_FXD:.WORD l, _END_##l - l:* = * - 5:l .(
+#define FIXED(l)	.BYTE _SM_FXD:.WORD l, _END_##l - l:* = * - 5:l .(
 
-; header for relocatable code: l(abel), s(tart) => starting offset, length of code
-#define CODE(l, s)	.BYTE _RLC_CD:.WORD s - l, _END_##l - l: * = * -5:l .(
+; header for relocatable code: l(abel) => starting offset, length of code
+#define CODE(l)		.BYTE _RLC_CD:.WORD _start - l, _END_##l - l: * = * -5:l .(
+#define START		&_start
 
-; header for relocatable data: l(abel), s(tart) of zeroed data, => length of zeroed data, length of preset data
-#define DATA(l, s)	.BYTE _RLC_DT:.WORD _END_##l - s, s - l: * = * - 5:l .(
+; header for relocatable data: l(abel) => length of zeroed data, length of preset data
+#define DATA(l)		.BYTE _RLC_DT:.WORD _END_##l - _zero, _zero - l: * = * - 5:l .(
+#define ZERO		&_zero
 
-; initialize memory
-#define INIT(v)		.BYTE _SET_V(#v)
+; initialize v(alue)
+#define VALUE(v)	.BYTE _SET_V(#v)
 
 ; reserve c(ount)
-#define ZERO(c)		.DSB c * 4, 0	
+#define RESERVE(c)	* = * + c * 4
 
 ; common begin and end
-#define BGN(l)		l .(
+#define BEGIN(l)	l .(
 #define END(l)		.):_END_##l
 
 #endif /* __MACROS_H */

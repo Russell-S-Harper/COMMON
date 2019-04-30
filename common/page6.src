@@ -2,13 +2,15 @@
 #include "macros.h"
 #include "globals.h"
 
-	* = 0
+	* = $1000	; any address outside of page zero is okay
 
-CODE(DEMO, DEMO)
+CODE(DEMO)
+START
 	CMN
 	SET(R0, 9.4662)
-	SET(R1, 0)
+	SET(R1, 2)
 	LDI(R7, R1)
+	MUL(R7, R7, R7)
 	SVI(R1, R0)
 	PSH(R0)
 	BRS(FACTORIAL)
@@ -18,9 +20,9 @@ CODE(DEMO, DEMO)
 	ESC
 	BRK
 
-BGN(FACTORIAL)
+BEGIN(FACTORIAL)
 	POP(R1)
-	SET(R2, 1)
+	SET(R2, 3)
 	MOD(R3, R1, R2)
 	SUB(R1, R1, R3)
 _1	TST(R1)
@@ -34,7 +36,9 @@ END(FACTORIAL)
 
 END(DEMO)
 
-DATA(WORKING, EXTRA)
-+PI	INIT(3.1415926535)
-+EXTRA	ZERO(2)
+DATA(WORKING)
+PI	VALUE(3.14159)
+E	VALUE(2.71828)
+SQRT2	VALUE(1.41421)
+ZERO	RESERVE(2)
 END(WORKING)
