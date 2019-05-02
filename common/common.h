@@ -88,13 +88,12 @@ _F_N	=  32				; if Rr < 0.0 (after TST)
 _F_O	=  64				; if overflow (after arithmetic operations)
 _F_U	= 128				; if underflow (after arithmetic operations)
 
-; register I7 maintains locations of code and allocated memory
-_CRL	= _I7				; code low and high bytes
-_CRH	= _CRL + 1
-_ARL	= _CRH + 1			; allocated low and high bytes
-_ARH	= _ARL + 1
-_CR	= _CRL				; code memory address
-_AR	= _ARL				; allocated memory address
+; register I7 maintains locations of allocated memory
+_ARLL	= _I7				; allocated low and high bytes
+_ARLH	= _ARLL + 1
+_ARUL	= _ARLH + 1			; allocated upper limit
+_ARUH	= _ARUL + 1
+_AR	= _ARLL				; allocated memory address
 
 ; register I8 is reserved for future use, e.g. context switching
 
