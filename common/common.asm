@@ -977,14 +977,23 @@ _CPR	.(		; CPR pq		0c pq		Rp <- Rq	- copy register
 
 _INILS	.(		; common initialization for LDI and SVI
 	JSR _CPYI1	; copy q to I1
+	LDA _I1+3	; check for negative offsets
+	BMI _1
 	CLC		; add the allocated memory offset
-	LDA _ARL
+	LDA _ARLL
 	ADC _I1+1
 	STA _I1+1
-	LDA _ARH
+	LDA _ARLH
 	ADC _I1+2
 	STA _I1+2
-	RTS
+	CMP _ARUH	; compare against upper limit
+	BCC _2		; for sure less
+	BNE _1		; not equal, must be more
+	LDA _I1+1
+	CMP _ARUL
+	BCC _2		; for sure less
+_1	BRK		; accessing out of bounds, abort and call exception handler (TODO)
+_2	RTS
 .)
 
 _LDI	.(		; LDI pq		0d pq		Rp <- (Rq:bbcc)	- load indirect from memory

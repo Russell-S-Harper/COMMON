@@ -2,13 +2,13 @@
 #include "macros.h"
 #include "globals.h"
 
-	* = $1000	; any address outside of page zero is okay
+	* = $1000		; any address outside of page zero is okay
 
 CODE(DEMO)
 START
 	CMN
 	SET(R0, 9.4662)
-	SET(R1, 2)
+	SET(R1, 5)
 	LDI(R7, R1)
 	MUL(R7, R7, R7)
 	SVI(R1, R0)

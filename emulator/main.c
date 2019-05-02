@@ -17,13 +17,12 @@
 #define _F	_PCH + 1	/* flags */
 #define _PC	_PCL		/* program counter */
 
-/* register I7 maintains locations of code and allocated memory */
-#define _CRL	_I7				/* code low and high bytes */
-#define _CRH	_CRL + 1
-#define _ARL	_CRH + 1			/* allocated low and high bytes */
-#define _ARH	_ARL + 1
-#define _CR	_CRL				/* code memory address */
-#define _AR	_ARL				/* allocated memory address */
+/* register I7 maintains locations of allocated */
+#define _ARLL	_I7				/* allocated low and high bytes */
+#define _ARLH	_ARLL + 1
+#define _ARUL	_ARLH + 1			/* allocated upper limit */
+#define _ARUH	_ARUL + 1
+#define _AR	_ARLL				/* allocated memory address */
 
 /* section modifiers */
 #define _SM_FXD	0x01
@@ -91,8 +90,8 @@ int main() {
 					/* offset the starting address */
 					entity += index;
 					/* save the starting address */
-					memory[_CRL] = entity & 0xff;
-					memory[_CRH] = entity >> 8;
+					memory[_PCL] = entity & 0xff;
+					memory[_PCH] = entity >> 8;
 					/* advance to the end of the section */
 					index += length;
 				}
@@ -102,17 +101,17 @@ int main() {
 				/* entity is the length of zeroed data, length is the length of preset data */
 				if (fread(memory + index, length, 1, stdin)) {
 					/* save the start of the data */
-					memory[_ARL] = index & 0xff;
-					memory[_ARH] = index >> 8;
+					memory[_ARLL] = index & 0xff;
+					memory[_ARLH] = index >> 8;
 					/* advance to the end of the section */
 					index += entity + length;
+					/* save the end of the data */
+					memory[_ARUL] = index & 0xff;
+					memory[_ARUH] = index >> 8;
 				}
 				break;
 		}
 	}
-
-	memory[_PCL] = 	memory[_CRL];
-	memory[_PCH] = 	memory[_CRH];
 
 	hookexternal(hook);
 
