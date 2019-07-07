@@ -27,8 +27,17 @@ int main(int argc, char **argv)
 				const char *s = "", *p, *q;
 				switch (tokens[i].type)
 				{
-					/* Process each _SET_V("<expr>") command */
-					case TT_COMMAND:
+					/* Process each _SET_V("<label>") command */
+					case TT_LABEL:
+						/* Extract the start and ending indices */
+						p = strchr(tokens[i].text, '"') + 1;
+						q = strrchr(tokens[i].text, '"');
+						j = (int)(q - p);
+						/* Output in .BYTE format */
+						printf("0, <(%.*s - _data), >(%.*s - _data), 0", j, p, j, p);
+						break;
+					/* Process each _SET_V("<expression>") command */
+					case TT_EXPRESSION:
 						/* Extract the start and ending indices */
 						p = strchr(tokens[i].text, '"') + 1;
 						q = strrchr(tokens[i].text, '"');

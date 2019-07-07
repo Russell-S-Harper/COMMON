@@ -2,27 +2,31 @@
 #include "macros.h"
 #include "globals.h"
 
-	* = $1000		; any address outside of page zero is okay
+	* = $300		; any address outside of page zero is okay because all code is relocatable
 
 CODE(DEMO)
+
 START
 	CMN
 	SET(R0, 9.4662)
-	SET(R1, 5)
+	SET(R1, SQRT2)
 	LDI(R7, R1)
 	MUL(R7, R7, R7)
-	SVI(R1, R0)
 	PSH(R0)
 	BRS(FACTORIAL)
 	POP(R4)
-	SET(R5, 1)
+	SET(R5, E)
 	LDI(R6, R5)
+	SET(R1, ZERO)
+	INR(R1)
+	SVI(R1, R6)
+	LDI(R0, R1)
 	ESC
 	BRK
 
 BEGIN(FACTORIAL)
 	POP(R1)
-	SET(R2, 3)
+	SET(R2, 1)
 	MOD(R3, R1, R2)
 	SUB(R1, R1, R3)
 _1	TST(R1)
@@ -36,9 +40,14 @@ END(FACTORIAL)
 
 END(DEMO)
 
-DATA(WORKING)
-PI	VALUE(3.14159)
-E	VALUE(2.71828)
-SQRT2	VALUE(1.41421)
-ZERO	RESERVE(2)
-END(WORKING)
+DATA(_)
+
+	; preset constants
+	DEFINE(PI, 3.14159)
+	DEFINE(E, 2.71828)
+	DEFINE(SQRT2, 1.41421)
+
+	; working space
+	RESERVE(2)
+
+END(_)
