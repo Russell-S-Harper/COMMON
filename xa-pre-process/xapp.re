@@ -72,18 +72,25 @@ int tokenizeInput(const char *cursor, TOKEN *tokens)
 
 		WHITE_SPACE	= BELL | BACKSPACE | HORIZONTAL_TAB | ESCAPE | DELETE | SPACE ;
 
+		SET_V_BGN	= LOW_LINE [Ss][Ee][Tt] LOW_LINE [Vv] WHITE_SPACE* LEFT_PARENTHESIS WHITE_SPACE* QUOTATION_MARK ;
+
+		SET_V_END	= QUOTATION_MARK WHITE_SPACE* RIGHT_PARENTHESIS ;
+
 		VALID		= DIGIT | LETTER | EXCLAMATION_MARK | DOLLAR_SIGN | PERCENT_SIGN | AMPERSAND
 					| LEFT_PARENTHESIS | RIGHT_PARENTHESIS | ASTERISK | PLUS_SIGN | HYPHEN_MINUS
 					| FULL_STOP | SOLIDUS | LESS_THAN_SIGN | EQUALS_SIGN | GREATER_THAN_SIGN
 					| LOW_LINE | VERTICAL_LINE | TILDE | WHITE_SPACE ;
 
-		COMMAND		= LOW_LINE [Ss][Ee][Tt] LOW_LINE [Vv] WHITE_SPACE* LEFT_PARENTHESIS WHITE_SPACE* QUOTATION_MARK VALID+ QUOTATION_MARK WHITE_SPACE* RIGHT_PARENTHESIS ;
+		LABEL		= SET_V_BGN ( LETTER | LOW_LINE ) ( LETTER | LOW_LINE | DIGIT )* SET_V_END ;
+
+		EXPRESSION	= SET_V_BGN VALID+ SET_V_END ;
 
 		DEFAULT		= . ;
 
 		END_OF_LINE	= ( LINE_FEED | VERTICAL_TAB | FORM_FEED | CARRIAGE_RETURN )+ ;
 
-		COMMAND		{ i = copyToken(tokens, i, TT_COMMAND, token, (int)(cursor - token)); continue; }
+		LABEL		{ i = copyToken(tokens, i, TT_LABEL, token, (int)(cursor - token)); continue; }
+		EXPRESSION	{ i = copyToken(tokens, i, TT_EXPRESSION, token, (int)(cursor - token)); continue; }
 		DEFAULT		{ i = copyToken(tokens, i, TT_DEFAULT, token, (int)(cursor - token)); continue; }
 		WHITE_SPACE	{ i = copyToken(tokens, i, TT_WHITE_SPACE, token, (int)(cursor - token)); continue; }
 		END_OF_LINE	{ i = copyToken(tokens, i, TT_END_OF_LINE, token, (int)(cursor - token)); continue; }

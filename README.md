@@ -34,14 +34,14 @@ The meat of the project:
 * `common/common.h`: details of instructions
 * `common/common.asm`: assembler code for the instructions
 * `common/macros.h`: macros used to define the interpreted byte-code
-* `common/page6.src`: sample source file using the macros
+* `common/appl.src`: sample source file using the macros
 
 Auxiliary:
 
 * `emulator/*`: 6502 emulator (borrowed Mike Chambers’ Fake6502 CPU emulator v1.1 ©2011)
 * `xa-pre-process/*`: my utility `xapp` to convert 32-bit fixed decimal quantities so that `xa` can use them
 
-Right now, for testing purposes, the code builds everything into one file `system.obj` and runs the code in the last block loaded, in this case, the code corresponding to `page6.src`. Eventually will support decoupling of system and application files. Application files will be inherently relocatable.
+Right now, for testing purposes, the code builds everything into one file `system.obj` and runs the code in the last block loaded, in this case, the code corresponding to `appl.src`. Eventually will support decoupling of system and application files. Application files will be inherently relocatable.
 
 To build and run:
 
