@@ -7,6 +7,11 @@
 
 long long result;
 
+/* Check if EXP_FRAC is compatible */
+#if	(1 << EXP_FRAC) != (1 << CHAR_BIT) * ((EXP_FULL + CHAR_BIT - 1) / CHAR_BIT)
+#error	"Code needs to be modified to handle current EXP_FRAC!"
+#endif
+
 int main(int argc, char **argv)
 {
 	TOKEN tokens[TOKENS];
@@ -33,7 +38,7 @@ int main(int argc, char **argv)
 						p = strchr(tokens[i].text, '"') + 1;
 						q = strrchr(tokens[i].text, '"');
 						j = (int)(q - p);
-						/* Output in .BYTE format */
+						/* Output in .BYTE format - this code is actually dependent on EXP_FRAC */
 						printf("0, <(%.*s - _data), >(%.*s - _data), 0", j, p, j, p);
 						break;
 					/* Process each _SET_V("<expression>") command */
