@@ -23,7 +23,7 @@ BIN	%[01]+(\.[01]+)?
 (<>)|(><)		return NE_OP;
 "&&"			return AND_OP;
 "||"			return OR_OP;
-[ \t\n]+        	; /* Ignore whitespace */
+[ \t\r\n]+        	; /* Ignore whitespace */
 [-()<>+~!*/%=&^|]	return yytext[0];
 .			{ fprintf(stderr, "SET (invalid character '%s')\n", yytext); exit(1); }
 
