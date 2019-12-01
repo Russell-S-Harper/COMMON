@@ -26,9 +26,9 @@ _2	LDY #0
 	INC _PCH
 _3	TAX		; save operand for later
 	AND #$F0
-	BEQ _4		; go to 0X instructions
+	BEQ _4		; go to BRX 0X instructions
 	CMP #$F0	; check for FX functions
-	BEQ _5		; go to FX instructions
+	BEQ _5		; go to EXT FX instructions
 	LSR		; get offset to XR instructions
 	LSR
 	LSR
@@ -45,7 +45,7 @@ _3	TAX		; save operand for later
 	ASL
 	TAX		; back to index
 	RTS		; "return" to routine
-_4	TXA		; get operand
+_4	TXA		; BRX get operand
 	ASL		; shift to get offset to 0X instructions
 	TAY
 	LDA FN_0X+1,Y	; push high address
@@ -54,7 +54,7 @@ _4	TXA		; get operand
 	PHA
 	TXA		; restore operand
 	RTS		; "return" to routine
-_5	TXA		; get operand
+_5	TXA		; EXT get operand
 	AND #$F		; mask to get index
 	ASL		; shift to get offset to FX instructions
 	TAY
