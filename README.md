@@ -25,9 +25,9 @@ Completed:
 
 In progress:
 
+* emulation of serial ports to allow standard I/O
 * a unit test suite to ensure each instruction is correct
 * a proof-of-concept application
-* “simple” multitasking?
 
 The meat of the project:
 
