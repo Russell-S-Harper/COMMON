@@ -1,5 +1,7 @@
-emulator: emulator.h emulator.c main.c
-	gcc -o emulator emulator.c main.c
+TGT=emulator
+
+$(TGT): $(TGT).h $(TGT).c main.c
+	gcc -o $(TGT) $(TGT).c main.c
 
 clean:
-	rm -f emulator
+	rm -f $(TGT)
