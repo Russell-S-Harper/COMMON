@@ -6,15 +6,23 @@
 ; to be able to recognize an overflow/underflow situation, rescale the arguments, and repeat the
 ; calculation.
 
-;  Largest value: $3fffffff or +1048575.999(5)
-;       Plus one: $00000400
-;           Zero: $00000000
-;      Minus one: $fffffc00
-; Smallest value: $c0000000 or -1048576.000(0)
+;  Largest value: +1048575.999(5) internally $3fffffff
+; Smallest value: -1048576.000(0) internally $c0000000
+;       Plus one:       +1        internally $00000400
+;           Zero:        0        internally $00000000
+;      Minus one:       -1        internally $fffffc00
+;
+; Literals can be in bases 10, 16, 8, or 2, with $, &, and % as prefixes for bases 16, 8, and 2
+; respectively. Some examples, all representing the same value:
+;
+; DEC:        1000.25
+; HEX:        $3E8.40
+; OCT:       &1750.20
+; BIN: %1111101000.01
 
 ; Instructions
 
-; SET r aabbcc.dd	1r dd cc bb aa	Rr <- aabbccdd	- set register
+; SET r aabbccdd	1r dd cc bb aa	Rr <- aabbccdd	- set register
 ; LDD r xxyy		2r yy xx	Rr <- (xxyy)	- load register directly from address
 ; SVD r xxyy		3r yy xx	(xxyy) <- Rr	- save register directly to address
 ; PSH r			4r		RS <- Rr	- push onto stack
