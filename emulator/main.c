@@ -36,33 +36,10 @@
 
 uint8_t memory[65536];
 
-uint8_t read6502(uint16_t address) {
-	return memory[address];
-}
-
-void write6502(uint16_t address, uint8_t value) {
-	memory[address] = value;
-}
-
-void hook() {
-	int i, j;
-
-	printf("\n%04x %u %u\n", pc, instructions, clockticks6502);
-	for (i = _R0; i < _R8; i += 4) {
-		printf("R%d: ", (i - _R0) / 4);
-		for (j = 0; j < 4; ++j)
-			printf("%02x ", memory[i + j]);
-		if (((i - _R0) / 4) % 4 == 3)
-			printf("\n");
-	}
-	for (i = _I0; i < _I8; i += 4) {
-		printf("I%d: ", (i - _I0) / 4);
-		for (j = 0; j < 4; ++j)
-			printf("%02x ", memory[i + j]);
-		if (((i - _I0) / 4) % 4 == 3)
-			printf("\n");
-	}
-}
+/* Functions for emulator */
+uint8_t read6502(uint16_t address);
+void write6502(uint16_t address, uint8_t value);
+void hook();
 
 int main() {
 
@@ -117,9 +94,40 @@ int main() {
 
 	reset6502();
 
+	/* TODO: access irq6502(); on a timer */
+
 	do
 		step6502();
 	while (memory[pc]);
 
 	return 0;
+}
+
+
+uint8_t read6502(uint16_t address) {
+	return memory[address];
+}
+
+void write6502(uint16_t address, uint8_t value) {
+	memory[address] = value;
+}
+
+void hook() {
+	int i, j;
+
+	printf("\n%04x %u %u\n", pc, instructions, clockticks6502);
+	for (i = _R0; i < _R8; i += 4) {
+		printf("R%d: ", (i - _R0) / 4);
+		for (j = 0; j < 4; ++j)
+			printf("%02x ", memory[i + j]);
+		if (((i - _R0) / 4) % 4 == 3)
+			printf("\n");
+	}
+	for (i = _I0; i < _I8; i += 4) {
+		printf("I%d: ", (i - _I0) / 4);
+		for (j = 0; j < 4; ++j)
+			printf("%02x ", memory[i + j]);
+		if (((i - _I0) / 4) % 4 == 3)
+			printf("\n");
+	}
 }
