@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 						q = strrchr(tokens[i].text, '"');
 						j = (int)(q - p);
 						/* Output in .BYTE format - this code is actually dependent on EXP_FRAC */
-						printf("0, <(%.*s - _data), >(%.*s - _data), 0", j, p, j, p);
+						printf("0, <(%.*s - _rdt), >(%.*s - _rdt), 0", j, p, j, p);
 						break;
 					/* Process each _SET_V("<expression>") command */
 					case TT_EXPRESSION:

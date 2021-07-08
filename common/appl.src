@@ -4,9 +4,8 @@
 
 	* = $300		; any address outside of page zero is okay because all code is relocatable
 
-CODE(DEMO)
+RCD(DEMO)
 
-START
 	CMN
 	SET(R0, 9.4662)
 	SET(R1, SQRT2)
@@ -17,14 +16,15 @@ START
 	POP(R4)
 	SET(R5, E)
 	LDI(R6, R5)
-	SET(R1, ZERO)
+	SET(R1, ZER)
 	INR(R1)
 	SVI(R1, R6)
 	LDI(R0, R1)
 	ESC
 	BRK
+	
+BGN(FACTORIAL)
 
-BEGIN(FACTORIAL)
 	POP(R1)
 	SET(R2, 1)
 	MOD(R3, R1, R2)
@@ -36,18 +36,19 @@ _1	TST(R1)
 	BRA(_1)
 _2	PSH(R2)
 	RTN
+	
 END(FACTORIAL)
 
 END(DEMO)
 
-DATA(_)
+RDT(_)
 
 	; preset constants
-	DEFINE(PI, 3.14159)
-	DEFINE(E, 2.71828)
-	DEFINE(SQRT2, 1.41421)
+	DEF(PI, 3.14159)
+	DEF(E, 2.71828)
+	DEF(SQRT2, 1.41421)
 
 	; working space
-	RESERVE(2)
+	RES(2)
 
 END(_)
