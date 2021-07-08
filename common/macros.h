@@ -78,23 +78,22 @@
 #define EXT(f)		.BYTE _EXT_C + (f)
 
 ; header for fixed code or data
-#define FIXED(l)	.BYTE _SM_FXD : .WORD l, _END_##l - l : * = * - 5 : l .(
+#define FIX(l)		.BYTE _SM_FXD : .WORD l, _END_##l - l : * = * - 5 : l .(
 
 ; header for relocatable code: l(abel) => starting offset, length of code
-#define CODE(l)		.BYTE _RLC_CD : .WORD _start - l, _END_##l - l : * = * - 5 : l .(
-#define START		&_start
+#define RCD(l)		.BYTE _RLC_CD : .WORD _rcd - l, _END_##l - l : * = * - 5 : l .( : &_rcd
 
 ; header for relocatable data: l(abel) => length of zeroed data, length of preset data
-#define DATA(l)		.BYTE _RLC_DT : .WORD _END_##l - _zero, _zero - l : * = * - 5 : l .( : &_data
+#define RDT(l)		.BYTE _RLC_DT : .WORD _END_##l - _zer, _zer - l : * = * - 5 : l .( : &_rdt
 
 ; define l(abel), v(alue)
-#define DEFINE(l, v)	&l .BYTE _SET_V(#v)
+#define DEF(l, v)	&l .BYTE _SET_V(#v)
 
-; reserve c(ount) & provide an alias for _zero
-#define RESERVE(c)	&ZERO : &_zero : * = * + (c) * 4
+; reserve c(ount) & provide an alias for _zer
+#define RES(c)		&ZER : &_zer : * = * + (c) * 4
 
 ; common begin and end
-#define BEGIN(l)	l .(
+#define BGN(l)		l .(
 #define END(l)		.) : _END_##l
 
 #endif /* __MACROS_H */
