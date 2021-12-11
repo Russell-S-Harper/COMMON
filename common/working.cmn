@@ -1,0 +1,43 @@
+
+RCD(UNIT_TESTS)
+
+		CMN
+		BRS(FIBONACCI) ; #Expect FIBONACCI: 2.236 5.000
+		ESC
+		BRK
+
+; Calculate the square root of five using this Fibonacci series identity:
+;
+;  F(n)    F(n-1)    _
+; ------ + ------ → √5 as n → ∞
+; F(n-1)    F(n)
+;
+; FIBONACCI: 2.236 5.000
+
+BGN(FIBONACCI)
+
+		SET(R0, 1)
+		CPR(R1, R0)
+_1		ADD(R2, R1, R0)
+		BRO(_2)
+		CPR(R0, R1)
+		CPR(R1, R2)
+		BRA(_1)
+_2		DIV(R2, R0, R1)
+		DIV(R1, R1, R0)
+		ADD(R0, R1, R2)
+		MUL(R1, R0, R0)
+		EXT(S1, O_FIBONACCI)
+		RTN
+
+END(FIBONACCI)
+
+END(UNIT_TESTS)
+
+RDT(_)
+
+	; Preset constants
+	; Output D format: decimal, leading sign for negative, no padding, no thousands separators, period for decimal, three decimal places 
+	DEF(O_FIBONACCI, 'FIBONACCI: \eD0 \eD1\n')
+
+END(_)
