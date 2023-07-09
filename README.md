@@ -17,7 +17,7 @@ Why 6502 and not, for example, x86?
 * 6502 assembler is very easy and has a large archive of existing functions
 * existing 6502 SWEET16 already has the “hard work” done
 * interesting to see it run in newer faster versions of 6502 processors
-* how do you think Bender does what he does? (or the Terminator!)
+* how do you think [Bender](https://spectrum.ieee.org/the-truth-about-benders-brain) does what he does? (or the [Terminator](https://www.apl2bits.net/2016/07/18/terminator-6502/)!)
 
 Completed:
 
@@ -25,7 +25,7 @@ Completed:
 
 In progress:
 
-* larger stack size, current stack size is only about 60, 250 or so would be better
+* larger stack size, current stack size is only about 60 numbers, 250 or so would be better
 * emulation of serial ports to allow standard I/O
 * a unit test suite to ensure each instruction is correct
 * a proof-of-concept application
