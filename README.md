@@ -28,7 +28,7 @@ In progress:
 * larger stack size, current stack size is only about 60 numbers, 250 or so would be better
 * emulation of serial ports to allow standard I/O
 * a unit test suite to ensure each instruction is correct
-* a proof-of-concept application
+* a proof-of-concept application with decoupled system and application files
 
 The meat of the project:
 
