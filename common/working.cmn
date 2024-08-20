@@ -37,7 +37,7 @@ END(UNIT_TESTS)
 RDT(_)
 
 	; Preset constants
-	; Output D format: decimal, leading sign for negative, no padding, no thousands separators, period for decimal, three decimal places 
+	; Output D format: decimal, leading sign for negative, no padding, no thousands separators, period for decimal, three decimal places
 	DEF(O_FIBONACCI, 'FIBONACCI: \eD0 \eD1\n')
 
 END(_)
