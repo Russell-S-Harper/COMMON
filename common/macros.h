@@ -48,7 +48,7 @@
 #define ESC		.BYTE _ESC_C
 #define RTN		.BYTE _RTN_C
 #define BRS(o)		.BYTE _BRS_C, _BRX_M(o)
-#define BRA(o)		.BYTE _BRA_C, _BRX_M(o)
+#define BRI(o)		.BYTE _BRI_C, _BRX_M(o)
 #define BRE(o)		.BYTE _BRE_C, _BRX_M(o)
 #define BRG(o)		.BYTE _BRG_C, _BRX_M(o)
 #define BRL(o)		.BYTE _BRL_C, _BRX_M(o)

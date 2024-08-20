@@ -40,7 +40,7 @@
 ; ESC			00				- escape back into regular assembler
 ; RTN			01				- return from subroutine
 ; BRS xxyy		02 yy xx	PC <- PC + xxyy	- branch to subroutine
-; BRA xxyy		03 yy xx	PC <- PC + xxyy	- branch always
+; BRI xxyy		03 yy xx	PC <- PC + xxyy	- branch invariably
 ; BRE xxyy		04 yy xx	PC <- PC + xxyy	- branch if Rp = Rq (after CMR)
 ; BRG xxyy		05 yy xx	PC <- PC + xxyy	- branch if Rp > Rq (after CMR)
 ; BRL xxyy		06 yy xx	PC <- PC + xxyy	- branch if Rp < Rq (after CMR)
@@ -127,7 +127,7 @@ FN_FX	= $300 - 2 * 16			; list of system and user functions
 _ESC_C	= $00
 _RTN_C	= $01
 _BRS_C	= $02
-_BRA_C	= $03
+_BRI_C	= $03
 _BRE_C	= $04
 _BRG_C	= $05
 _BRL_C	= $06

@@ -33,7 +33,7 @@ _1	TST(R1)
 	BRZ(_2)
 	MUL(R2, R2, R1)
 	DCR(R1)
-	BRA(_1)
+	BRI(_1)
 _2	PSH(R2)
 	RTN
 	

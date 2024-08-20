@@ -911,14 +911,14 @@ _BRS	.(		; BRS xxyy		02 yy xx	PC <- PC + xxyy	- branch to subroutine
 	JMP _UPPCI0	; update PC with I0 offset, let it handle the return
 .)
 
-_BRA	.(		; BRA xxyy		03 yy xx	PC <- PC + xxyy	- branch always
+_BRI	.(		; BRI xxyy		03 yy xx	PC <- PC + xxyy	- branch invariably
 	JSR _INIBR	; save the offset and update PC by the length of a branch address
 	JMP _UPPCI0	; update PC with I0 offset, let it handle the return
 .)
 
 _BRX	.(		; generic branch testing
 	AND _F		; check the bit
-	BNE _BRA	; if set, branch
+	BNE _BRI	; if set, branch
 	JMP _UPDPC	; not set, advance the program counter over the xxyy offset, let it handle the return
 .)
 
@@ -1069,7 +1069,7 @@ _END_CMN_CD
 	; beginning of ROM data
 	* = CMN_DT
 
-FN_0X	.WORD _ESC-1, _RTN-1, _BRS-1, _BRA-1, _BRE-1, _BRG-1, _BRL-1, _BRZ-1,
+FN_0X	.WORD _ESC-1, _RTN-1, _BRS-1, _BRI-1, _BRE-1, _BRG-1, _BRL-1, _BRZ-1,
 	.WORD _BRP-1, _BRN-1, _BRO-1, _BRU-1, _CPR-1, _LDI-1, _SVI-1, _CMR-1
 FN_XR	.WORD _SET-1, _LDD-1, _SVD-1, _PSH-1, _POP-1, _EXC-1, _INR-1,
 	.WORD _DCR-1, _TST-1, _ADD-1, _SUB-1, _MUL-1, _DIV-1, _MOD-1
